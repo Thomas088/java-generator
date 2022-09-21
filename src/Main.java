@@ -30,6 +30,6 @@ public class Main {
 	
 		// out.println("Fin du programme.");
 		
-		out.println("TEST PRINT JAVA OK"); // IF DISPLAYED IN TERMINAL, IT'S OK ! 
+		
 	}
 }

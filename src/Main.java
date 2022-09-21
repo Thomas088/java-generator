@@ -28,7 +28,7 @@ public class Main {
 		   // Implementer logique du menu sur console	
 		// }
 	
-		// out.println("Fin du programme.");
+
 		
 		
 	}

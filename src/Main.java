@@ -28,8 +28,8 @@ public class Main {
 		   // Implementer logique du menu sur console	
 		// }
 	
-		// out.println("Fin du programme.");
+
 		
-		out.println("TEST PRINT JAVA OK"); // IF DISPLAYED IN TERMINAL, IT'S OK ! 
+		
 	}
 }

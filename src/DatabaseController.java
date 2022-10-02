@@ -13,8 +13,8 @@ import static java.lang.System.*;
 				Connection connection = null;
 				String databaseName ="insert";
 				String url = "jdbc:mariadb://localhost:3306/";
-				String user ="root";
-				String pwd ="Titi1234";
+				String user ="";
+				String pwd ="";
 
 			    connection = DriverManager.getConnection(url
 			    										+ databaseName 

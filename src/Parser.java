@@ -19,6 +19,8 @@ public class Parser {
 	 */
 	private static String getTablenameByIndex(String currentLine) {
 		
+		tableResult = "";
+		
 		 for (int i = 0; i < currentLine.length(); i++) {
 
 			 char currentCaracter = currentLine.charAt(i);
@@ -44,6 +46,8 @@ public class Parser {
 	 */
 	private static String getTablenameByRegex(String currentLine) {
 		
+		tableResult = "";
+		
 		Pattern createTablePattern = Pattern.compile(createTableStr, Pattern.CASE_INSENSITIVE);
         Matcher create_table_matcher = createTablePattern.matcher(currentLine);
          
@@ -65,15 +69,13 @@ public class Parser {
         while(scanner.hasNextLine()) {
         	
             String strCurrentLine = scanner.nextLine();
-
+            
             if (strCurrentLine.startsWith(createTableStr)) {
-             
-                 tableResult = getTablenameByRegex(strCurrentLine);
-                 
-            } else {
-            	strCurrentLine = "";
+            	
+            	// DEMO 
+                 System.out.println(getTablenameByRegex(strCurrentLine)); 
+                 System.out.println(getTablenameByIndex(strCurrentLine)); 
             }
         }
-        System.out.println(tableResult); 
     }      
  }  

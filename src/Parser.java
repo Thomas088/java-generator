@@ -49,9 +49,9 @@ public class Parser {
 		tableResult = "";
 		
 		Pattern createTablePattern = Pattern.compile(createTableStr, Pattern.CASE_INSENSITIVE);
-        Matcher create_table_matcher = createTablePattern.matcher(currentLine);
+        Matcher createTableMatcher = createTablePattern.matcher(currentLine);
          
-        if (create_table_matcher.find()) {
+        if (createTableMatcher.find()) {
         	tableResult = currentLine.replaceAll(createTableStr, "").replace(Character.toString(parenthese), "").trim();
         }
 		
@@ -63,8 +63,8 @@ public class Parser {
         File jMeriseSQL = new File("./test.sql");
         Scanner scanner = new Scanner(jMeriseSQL);
              
-        String tableResult = "";
-        String[] list_of_tables = {};
+        String currentTable = "";
+        String[] listOfTables = {};
        
         while(scanner.hasNextLine()) {
         	

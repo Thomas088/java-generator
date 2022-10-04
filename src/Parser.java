@@ -23,7 +23,7 @@ public class Parser {
 		
 		 for (int i = 0; i < currentLine.length(); i++) {
 
-			 char currentCaracter = currentLine.charAt(i);
+			char currentCaracter = currentLine.charAt(i);
 		        // Si l'on tombe apres le CREATE TABLE et l'espace
 		    if (i >= createTableStr.length()) {
 
@@ -31,7 +31,7 @@ public class Parser {
 		        if (!(Character.compare(currentCaracter, parenthese) == 0)) {
 		                 tableResult += Character.toString(currentCaracter);
 		        } else {
-		        	break; // force end loop if we catch the parenthesis or other stuffs such as empty spaces etc 
+		        	break; // force end loop if we match the parenthesis or other stuffs such as empty spaces etc 
 		        }
 		     }
 		 }

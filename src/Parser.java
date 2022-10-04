@@ -14,7 +14,7 @@ public class Parser {
 	
 	/**
 	 * getTablenameByIndex => get the table name(s) of generated .SQL or text file (works for Jmerise) - Search by string indexes
-	 * @param currentLine
+	 * @param {String} currentLine
 	 * @return {String} The tablename
 	 */
 	private static String getTablenameByIndex(String currentLine) {
@@ -39,7 +39,7 @@ public class Parser {
 	
 	/**
 	 * getTablenameByRegex => get the table name(s) of generated .SQL or text file - Search by regular expression (regex)
-	 * @param currentLine
+	 * @param {String} currentLine
 	 * @return {String} The tablename
 	 */
 	private static String getTablenameByRegex(String currentLine) {
@@ -59,13 +59,12 @@ public class Parser {
         File jMeriseSQL = new File("./test.sql");
         Scanner scanner = new Scanner(jMeriseSQL);
              
-        String tableResult = null;
+        String tableResult = "";
         String[] list_of_tables = {};
        
         while(scanner.hasNextLine()) {
         	
             String strCurrentLine = scanner.nextLine();
-            int currenLineLength = strCurrentLine.length();
 
             if (strCurrentLine.startsWith(createTableStr)) {
              

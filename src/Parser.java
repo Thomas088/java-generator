@@ -28,11 +28,13 @@ public class Parser {
 		        // ... ET si l'on ne tombe pas sur la parenthese ouvrante
 		        if (!(Character.compare(currentCaracter, parenthese) == 0)) {
 		                 tableResult += Character.toString(currentCaracter);
+		        } else {
+		        	break; // force end loop if we catch the parenthesis or other stuffs such as empty spaces etc 
 		        }
 		     }
 		 }
 		 
-		return tableResult;
+		return tableResult.trim();
 	}
 	
 	/**
@@ -47,7 +49,6 @@ public class Parser {
          
         if (create_table_matcher.find()) {
         	tableResult = currentLine.replaceAll(createTableStr, "").replace(Character.toString(parenthese), "").trim();
-        	out.println(tableResult);
         }
 		
         return tableResult;

@@ -1,35 +1,67 @@
 import static java.lang.System.*;
 
-public class Main {
+import java.util.HashMap;
+import java.util.LinkedList;
 
-	public static void main(String[] args) {
+public class Main 
+{
+
+	public static void main(String[] args) 
+	{
 		
 		// IMPORT DES AUTRES CLASSES NECESSAIRE AU MENU
 		MenuDisplays menus = new MenuDisplays();
 		Parser parser = new Parser();
 		Helpers helper = new Helpers();
 		
-		// DECLARATION DES VARIABLES POUR L'UTILISATEUR
-		String userResponse = "N";
-		String entity = "";
-		String insertQueryGenerated = "";
-		String newAttribute = "";
+		LinkedList<String> arrayTables = new LinkedList<String>();
+		LinkedList<String> arrayAttribut = new LinkedList<String>();
 		
-		// VERIFIER LE CARACTERE DE CERTAINES VARIABLES
+        String currentTable = "";
+        String currentAttribut = "";
+        String answerForTables = "y";
+        String answerForAttribut = "y";
+        
+               
+			while(answerForTables.equalsIgnoreCase("y")) 
+			{
+				answerForTables = "";	
+				out.println("Enter table name : ");
+				currentTable = helper.readString().trim(); // déjà un while dans le Helpers
+				
+				
+				arrayTables.add(currentTable);  // on push dans le tableau de tables
+				
+				while(answerForAttribut.equalsIgnoreCase("y"))	
+					
+				{
+					answerForAttribut = "";
+					out.println("Enter attribute name : ");
+					currentAttribut = helper.readString().trim();
+					arrayAttribut.add(currentAttribut);
+					answerForAttribut = helper.chooseContinueState();
+					
+					if(answerForAttribut.equalsIgnoreCase("n")) break;
+					
+				};
+				
+				if(arrayTables.size() >= 1) { // si on a plus d'une table...
+					out.println("Do you want to RE-enter a table ? : ");
+				}
+				
+				answerForTables = helper.chooseContinueState(); // méthode de l'état de continue ou non dans les Helpers
+				if(answerForTables.equalsIgnoreCase("n")) break;
+				
+			 }
+			
+	    	 out.println(arrayTables);
+	    	 out.println(arrayAttribut);
+	 }      
+			      
+}        
 		
-		boolean isForInsert = false; // <= SI ON VEUT FAIRE UN MODE DEMO PAR EX...
-		boolean isValueConstant = false; // VALEUR FIXE OU NON
 		
-		// NOMBRES DE LIGNES A INSERER
-		int totalRow = 0;
-		
-		
-		// while (userResponse != "Y") {
-		   // Implementer logique du menu sur console	
-		// }
 	
 
-		
-		
-	}
-}
+
+

@@ -42,16 +42,19 @@ public class Helpers {
 	
 	public String chooseContinueState() {
 		
+		// String newline = System.getProperty("line.separator"); a voir si besoin par la suite
 		String choice = "";
 		
 		while(true) {
 			
+			
 			out.println("Do you want to continue ? (Yy / Nn)");
-			choice =  scanner.next().trim();
+			choice =  scanner.next().trim(); // enlève les espaces
 			
 			if (choice.length() == 1) {
 			
-				if (!choice.contains("Y")  && !choice.contains("y") && !choice.contains("N") && !choice.contains("n")) {
+					
+				if (choice.length() > 1 || (!choice.equalsIgnoreCase("y") && !choice.equalsIgnoreCase("n"))) {
 					err.println("Error bad value - invalid value entered - re-do.");
 					choice = "";
 				}

@@ -14,10 +14,10 @@ public class Main
 		Parser parser = new Parser();
 		Helpers helper = new Helpers();
 		
-		LinkedList<String> arrayTables = new LinkedList<String>();
-		LinkedList<String> arrayAttribut = new LinkedList<String>();
+		LinkedList<TableData> listOfTables = new LinkedList<TableData>();
+		TableData currentTable = null;
 		
-        String currentTable = "";
+        String userInput = "";
         String currentAttribut = "";
         String answerForTables = "y";
         String answerForAttribut = "y";
@@ -27,25 +27,29 @@ public class Main
 			{
 				answerForTables = "";	
 				out.println("Enter table name : ");
-				currentTable = helper.readString().trim(); // déjà un while dans le Helpers
+				userInput = helper.readString().trim(); // déjà un while dans le Helpers
 				
-				
-				arrayTables.add(currentTable);  // on push dans le tableau de tables
+				currentTable = new TableData(); 
+				currentTable.setTableName(userInput);
 				
 				while(answerForAttribut.equalsIgnoreCase("y"))	
 					
 				{
 					answerForAttribut = "";
 					out.println("Enter attribute name : ");
+					
 					currentAttribut = helper.readString().trim();
-					arrayAttribut.add(currentAttribut);
+					currentTable.pushInAttributeList(currentAttribut);
+					
 					answerForAttribut = helper.chooseContinueState();
 					
 					if(answerForAttribut.equalsIgnoreCase("n")) break;
 					
 				};
 				
-				if(arrayTables.size() >= 1) { // si on a plus d'une table...
+				listOfTables.add(currentTable);
+				
+				if(listOfTables.size() >= 1) { // si on a plus d'une table...
 					out.println("Do you want to RE-enter a table ? : ");
 				}
 				
@@ -54,8 +58,8 @@ public class Main
 				
 			 }
 			
-	    	 out.println(arrayTables);
-	    	 out.println(arrayAttribut);
+	    	 out.println(currentTable.getTableName());
+	    	 out.println(currentTable.getAttributeList());
 	 }      
 			      
 }        

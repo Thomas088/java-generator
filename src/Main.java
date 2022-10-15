@@ -1,35 +1,71 @@
 import static java.lang.System.*;
 
-public class Main {
+import java.util.HashMap;
+import java.util.LinkedList;
 
-	public static void main(String[] args) {
+public class Main 
+{
+
+	public static void main(String[] args) 
+	{
 		
 		// IMPORT DES AUTRES CLASSES NECESSAIRE AU MENU
 		MenuDisplays menus = new MenuDisplays();
 		Parser parser = new Parser();
 		Helpers helper = new Helpers();
 		
-		// DECLARATION DES VARIABLES POUR L'UTILISATEUR
-		String userResponse = "N";
-		String entity = "";
-		String insertQueryGenerated = "";
-		String newAttribute = "";
+		LinkedList<TableData> listOfTables = new LinkedList<TableData>();
+		TableData currentTable = null;
 		
-		// VERIFIER LE CARACTERE DE CERTAINES VARIABLES
+        String userInput = "";
+        String currentAttribut = "";
+        String answerForTables = "y";
+        String answerForAttribut = "y";
+        
+               
+			while(answerForTables.equalsIgnoreCase("y")) 
+			{
+				answerForTables = "";	
+				out.println("Enter table name : ");
+				userInput = helper.readString().trim(); // déjà un while dans le Helpers
+				
+				currentTable = new TableData(); 
+				currentTable.setTableName(userInput);
+				
+				while(answerForAttribut.equalsIgnoreCase("y"))	
+					
+				{
+					answerForAttribut = "";
+					out.println("Enter attribute name : ");
+					
+					currentAttribut = helper.readString().trim();
+					currentTable.pushInAttributeList(currentAttribut);
+					
+					answerForAttribut = helper.chooseContinueState();
+					
+					if(answerForAttribut.equalsIgnoreCase("n")) break;
+					
+				};
+				
+				listOfTables.add(currentTable);
+				
+				if(listOfTables.size() >= 1) { // si on a plus d'une table...
+					out.println("Do you want to RE-enter a table ? : ");
+				}
+				
+				answerForTables = helper.chooseContinueState(); // méthode de l'état de continue ou non dans les Helpers
+				if(answerForTables.equalsIgnoreCase("n")) break;
+				
+			 }
+			
+	    	 out.println(currentTable.getTableName());
+	    	 out.println(currentTable.getAttributeList());
+	 }      
+			      
+}        
 		
-		boolean isForInsert = false; // <= SI ON VEUT FAIRE UN MODE DEMO PAR EX...
-		boolean isValueConstant = false; // VALEUR FIXE OU NON
 		
-		// NOMBRES DE LIGNES A INSERER
-		int totalRow = 0;
-		
-		
-		// while (userResponse != "Y") {
-		   // Implementer logique du menu sur console	
-		// }
 	
 
-		
-		
-	}
-}
+
+

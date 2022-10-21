@@ -11,23 +11,25 @@ import java.sql.SQLException;
 // datas
 import java.util.Vector;
 
-// logs
-import java.util.logging.Level; 
-import java.util.logging.Logger; 
-import java.util.logging.*; 
-
 import static java.lang.System.*;
 
 	public class DatabaseController {
 		
 		private static String databaseName ="fake_database";
 		private static String url = "jdbc:mariadb://localhost:3306/";
-		private static String user ="root";
-		private static String pwd ="password01";
+		private static String user ="root"; // The main user in MariaDB
+		private static String pwd =""; // Type your password 
 		
 		private static Connection connection;
 		private static PreparedStatement statement;
-			
+		
+		private GeneratorLogger logger = new GeneratorLogger();
+		
+		/**
+		 * callSearchDatasProcedure() - Call the main procedure in database
+		 * @param {String} tableToSearch => the table to seach in database
+		 * @param {int} limit
+		 */
 		public void callSearchDatasProcedure(String tableToSearch, int limit) {
 			
 			Vector<String> dataVector = new Vector<String>();
@@ -55,11 +57,14 @@ import static java.lang.System.*;
 					}		
 				
 			} catch (SQLException e) {
-//				e.printStackTrace(); -- TODO : creer la classe Logger				
+				logger.logError("callSearchDatasProcedure()", e.getMessage()); 			
 			}		
 		}
 		
-		
+		/**
+		 * createConnection() : create a session connexion to mariaDB 
+		 * @return {boolean} : if the connection success or fail
+		 */
 		public boolean createConnection() {
 			
 			boolean isSuccess = false;
@@ -75,7 +80,7 @@ import static java.lang.System.*;
 			
 				} catch (SQLException e) {
 					isSuccess = false;
-					e.printStackTrace();
+					logger.logError("createConnection()", e.getMessage());
 				}
 			
 		    return isSuccess;

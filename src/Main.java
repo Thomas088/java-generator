@@ -18,6 +18,7 @@ public class Main
 		Parser parser = new Parser();
 		Helpers helper = new Helpers();
 		DatabaseController database = new DatabaseController();
+		GeneratorLogger logger = new GeneratorLogger();
 		
 		boolean isLogged = false;
 		
@@ -35,11 +36,11 @@ public class Main
             isLogged = database.createConnection();
             
             if (isLogged) {
-            	database.callSearchDatasProcedure("pone", 50);
+            	database.callSearchDatasProcedure("phone", 50);
             }
         	
         } catch (Exception e) {
-			e.printStackTrace();				
+        	logger.logError("Main()", e.getMessage());			
 		}		
         
 	 }      

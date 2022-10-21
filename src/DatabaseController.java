@@ -46,7 +46,7 @@ import static java.lang.System.*;
 						ResultSet datas = statement.executeQuery();
 			
 						while (datas.next()) {
-							dataVector.add(datas.getString(1));
+							dataVector.add(datas.getString(1).trim());
 						}
 						
 						out.println("SUCCESS : \n");
@@ -76,7 +76,7 @@ import static java.lang.System.*;
 			    										+ "?user="+ user 
 			    										+ "&password="+ pwd);
 			    
-			    if (connection.isValid(5)) isSuccess = true;
+			    	if (connection.isValid(5)) isSuccess = true;
 			
 				} catch (SQLException e) {
 					isSuccess = false;

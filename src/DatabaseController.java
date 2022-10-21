@@ -1,33 +1,84 @@
+// db config
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
-import java.sql.SQLException;
-import static java.lang.System.*;
 
+// statements
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+// datas
+import java.util.Vector;
+
+// logs
+import java.util.logging.Level; 
+import java.util.logging.Logger; 
+import java.util.logging.*; 
+
+import static java.lang.System.*;
 
 	public class DatabaseController {
 		
-		public void createConnection () {
+		private static String databaseName ="fake_database";
+		private static String url = "jdbc:mariadb://localhost:3306/";
+		private static String user ="root";
+		private static String pwd ="password01";
+		
+		private static Connection connection;
+		private static PreparedStatement statement;
 			
-			try {
+		public void callSearchDatasProcedure(String tableToSearch, int limit) {
+			
+			Vector<String> dataVector = new Vector<String>();
 				
-				Connection connection = null;
-				String databaseName ="insert";
-				String url = "jdbc:mariadb://localhost:3306/";
-				String user ="";
-				String pwd ="";
+			try {	
+				
+					statement = connection.prepareStatement("{call search_datas(?,?);}");
+					
+					statement.setString(1, tableToSearch);
+					statement.setInt(2, limit);
+					
+					if(!statement.isClosed()) {
+						
+						ResultSet datas = statement.executeQuery();
+			
+						while (datas.next()) {
+							dataVector.add(datas.getString(1));
+						}
+						
+						out.println("SUCCESS : \n");
+						out.println(dataVector);
+						
+					} else {
+						out.println("STATEMENT NOT OPEN");
+					}		
+				
+			} catch (SQLException e) {
+//				e.printStackTrace(); -- TODO : creer la classe Logger				
+			}		
+		}
+		
+		
+		public boolean createConnection() {
+			
+			boolean isSuccess = false;
 
-			    connection = DriverManager.getConnection(url
+			try {
+
+			    	connection = DriverManager.getConnection(url
 			    										+ databaseName 
 			    										+ "?user="+ user 
 			    										+ "&password="+ pwd);
-
-				out.println("Succes");
-
+			    
+			    if (connection.isValid(5)) isSuccess = true;
+			
 				} catch (SQLException e) {
-					e.printStackTrace();				
+					isSuccess = false;
+					e.printStackTrace();
 				}
+			
+		    return isSuccess;
 		}	
     }
 
-// TODO : Importer la JDBC ! (gestionnaire de requetes)
-// Tous les appels procedures doivent etre dans des try - catch !

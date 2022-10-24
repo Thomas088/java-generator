@@ -23,7 +23,7 @@ public class Parser {
 	private static final String createTableStr = "CREATE TABLE ";
 	private static final String openParenthese = "(";
 	private static final String closeParenthese = ")";
-	private static final String newline = "\n";
+	private static final String virgule = ",";
 	private static final StringBuilder tableResult = new StringBuilder();
 	private static final StringBuilder numberResult = new StringBuilder();
 	private static final StringBuilder attrResult = new StringBuilder();
@@ -65,7 +65,7 @@ public class Parser {
 	private static boolean isPrimaryKey(String currentLine) {
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logError("isPrimaryKey()", "Empty line.");
+			logger.logWarning("isPrimaryKey()", "Empty line.");
 			return false;
 		}
 		
@@ -81,7 +81,7 @@ public class Parser {
 	private static boolean isConstraintLine(String currentLine) {
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logError("isConstraintLine()", "Empty line.");
+			logger.logWarning("isConstraintLine()", "Empty line.");
 			return false;
 		}
 		
@@ -102,7 +102,7 @@ public class Parser {
 	private static boolean isNullAttributeLine(String currentLine) {
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logError("isNullAttributeLine()", "Empty line.");
+			logger.logWarning("isNullAttributeLine()", "Empty line.");
 			return false;
 		}
 		
@@ -121,7 +121,7 @@ public class Parser {
 	private static boolean isNotNullAttributeLine(String currentLine) {
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logError("isNotNullAttributeLine()", "Empty line.");
+			logger.logWarning("isNotNullAttributeLine()", "Empty line.");
 			return false;
 		}
 		
@@ -137,7 +137,7 @@ public class Parser {
 	private static boolean isForeignKey(String currentLine) {
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logError("isForeignKey()", "Empty line.");
+			logger.logWarning("isForeignKey()", "Empty line.");
 			return false;
 		}
 		
@@ -152,7 +152,7 @@ public class Parser {
 	private static boolean isCommentLine(String currentLine) { 
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logError("isCommentLine()", "Empty line.");
+			logger.logWarning("isPrimaryKey()", "Empty line.");
 			return false;
 		}
 		
@@ -176,7 +176,7 @@ public class Parser {
 	private static boolean isEndOfTable(String currentLine) { 
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logError("isEndOfTable()", "Empty line.");
+			logger.logWarning("isEndOfTable()", "Empty line.");
 			return false;
 		}
 		
@@ -192,7 +192,7 @@ public class Parser {
 	private static boolean isBooleanAttr(String currentLine) { 
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logError("isBooleanAttr()", "Empty line.");
+			logger.logWarning("isBooleanAttr()", "Empty line.");
 			return false;
 		}
 		
@@ -249,6 +249,8 @@ public class Parser {
          
         if (createTableMatcher.find()) {
         	tableResult.append(currentLine.replaceAll(createTableStr, "").replace(openParenthese, "").trim()) ;
+        } else {
+        	logger.logWarning("getTablenameByRegex()", "No match.");
         }
 		
         return tableResult.toString();
@@ -395,7 +397,7 @@ public class Parser {
 		return Integer.parseInt(numberResult.toString().trim());
 	}
 	
-	private static void printTableDatas(String currentLine) {
+	private static void printAttributeDatas(String currentLine) {
 		
     	boolean isNull = isNullAttributeLine(currentLine);
     	boolean isKey = isPrimaryKey(currentLine) || isForeignKey(currentLine);
@@ -412,6 +414,22 @@ public class Parser {
 		}
 	}
 	
+	public static void printTableName(String currentLine) {
+		
+    	if (currentLine.toString().startsWith(createTableStr)) {
+  
+    		out.println("------------------------------------");
+    		out.println("Table name : " + getTablenameByIndex(currentLine.toString()));
+    		out.println("------------------------------------");
+    	}
+		
+	}
+	
+//	public static void printClassicTable(String currentLine) {
+//		
+//	}
+	
+	
 	
 	// --------------------- PARSE --------------------- //
 	
@@ -422,8 +440,8 @@ public class Parser {
 	        File jMeriseSQL = new File("./labo-test/DBQ10.sql");
 	        Scanner scanner = new Scanner(jMeriseSQL);
 	        
-	        int i = 1;
-	        marker = 1;
+	        int i = 0;
+	        marker = 9999;
 	        int nbTables = 0;
 	        
 	        initStrings();
@@ -437,25 +455,19 @@ public class Parser {
 	            	if (currentLine.toString().startsWith(createTableStr)) {
 	            		
 	            		nbTables++;
-	            		out.println("------------------------------------");
-	            		out.println("Table number " + nbTables + " : " + getTablenameByIndex(currentLine.toString()));
-	            		out.println("------------------------------------");
-		        		marker = i;
+	            		out.println("Table number : " + nbTables);
+	            		printTableName(currentLine.toString());
+	            		marker = i;
 		        	}
 	            	
-		        	if (i > marker) {
-		        		
-			        	if (isEndOfTable(currentLine.toString())) {
-			        		break;
-		        	    }
-			        	
-			        	String temp = currentLine.toString();
-			        	        	
-	    				if (!isConstraintLine(temp)) {			
-	    					printTableDatas(temp);
-	    				}
-
-		        	}	
+	            	if (i > marker && !isEndOfTable(currentLine.toString())) {
+		            	String temp = currentLine.toString();
+		            	
+		            	if(!isConstraintLine(temp)) {
+		            		printAttributeDatas(temp);
+		            	}
+	            	}
+	            
 	        	}
 	        	
 	        	i++;

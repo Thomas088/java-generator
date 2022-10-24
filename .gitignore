@@ -32,6 +32,7 @@ tmp/
 .metadata
 .classpath
 .project
+.env
 *.tmp
 *.bak
 *.swp

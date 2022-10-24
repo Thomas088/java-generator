@@ -11,6 +11,8 @@ import java.sql.SQLException;
 // datas
 import java.util.Vector;
 
+//import io.github.cdimascio.dotenv.Dotenv;
+
 import static java.lang.System.*;
 
 /**
@@ -21,10 +23,10 @@ import static java.lang.System.*;
 	public class DatabaseController {
 		
 		// Credentials (in clear for the moment)
-		private static final String databaseName ="fake_database";
-		private static final String url = "jdbc:mariadb://localhost:3306/";
-		private static final String user ="root"; // The main user in MariaDB
-		private static final String pwd ="Vinyjeff"; // Type your password
+		private static final StringBuilder databaseName = new StringBuilder();
+		private static final StringBuilder url = new StringBuilder();
+		private static final StringBuilder user = new StringBuilder(); // The main user in MariaDB
+		private static final StringBuilder pwd = new StringBuilder(); // Type your password
 		
 		// Utils
 		private static final GeneratorLogger logger = new GeneratorLogger();
@@ -33,6 +35,39 @@ import static java.lang.System.*;
 		// DB
 		private static Connection connection;
 		private static PreparedStatement statement;
+		
+		DatabaseController() {
+			
+			initCredentials();
+			
+//		------------------------------------------------------- // 
+//			TODO : handle Dotenv !
+			
+//			Dotenv dotenv = Dotenv.load();			
+//			databaseName.append(dotenv.get("MARIADB_DB_NAME"));
+//			url.append(dotenv.get("MARIADB_DB_URL"));
+//	    	user.append(dotenv.get("MARIADB_USER"));
+//	    	pwd.append(dotenv.get("MARIADB_PASSWORD"));
+			
+//			------------------------------------------------------- // 
+			
+			databaseName.append("fake_database");
+			url.append("jdbc:mariadb://localhost:3306/");
+	    	user.append("root");
+	    	pwd.append("Vinyjeff");
+			
+		}
+		
+		/**
+		 * initStrings() : init all the StringBuilders
+		 */
+		private static void initCredentials() {
+			
+			databaseName.setLength(0);
+			url.setLength(0);
+			user.setLength(0);
+			pwd.setLength(0);
+		}
 		
 		/**
 		 * callSearchDatasProcedure() - Call the main procedure in database
@@ -108,13 +143,15 @@ import static java.lang.System.*;
 			boolean isSuccess = false;
 
 			try {
-
-			    	connection = DriverManager.getConnection(url
-			    										+ databaseName 
-			    										+ "?user="+ user 
-			    										+ "&password="+ pwd);
-			    
-			    	if (connection.isValid(5)) isSuccess = true;
+	
+				    	connection = DriverManager.getConnection(url.toString() 
+				    										+ databaseName.toString() 
+				    										+ "?user="+ user.toString() 
+				    										+ "&password="+ pwd.toString());
+				    	
+	
+				    
+				    if (connection.isValid(5)) isSuccess = true;
 			
 				} catch (SQLException e) {
 					isSuccess = false;

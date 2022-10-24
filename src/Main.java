@@ -29,7 +29,7 @@ public class Main {
 		
 		boolean isLogged = false;
 		
-		LinkedList<TableData> listOfTables = new LinkedList<TableData>();
+//		LinkedList<TableData> listOfTables = new LinkedList<TableData>();
 		TableData currentTable = null;
 		
         String userInput = "";
@@ -44,15 +44,12 @@ public class Main {
 //            
 //            if (isLogged) {
 //            	
-//            	database.callSearchDatasProcedure("phone", 50); // <= Decommenter pour tester
-//            	database.callGenerateRandomNumber(10, 10000); // <= Decommenter pour tester
+//            	database.callSearchDatasProcedure("address", 50); // <= Decommenter pour tester
 //            	
 //            } else {
 //            	logger.logError("createConnection()", "Error on connexion to database.");
 //            }
-        
-//            helper.clearConsole();
-//            menus.printMariaTypes();
+ 
         	parser.parseTEST();
           
         } catch (Exception e) {

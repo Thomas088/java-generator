@@ -2,11 +2,10 @@ import static java.lang.System.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 /**
@@ -33,8 +32,14 @@ public class Parser {
 	private static final StringBuilder currentCharacter = new StringBuilder();
 	private static final RegexRepertory regexRepertory = new RegexRepertory();
 	
+	private static TableData currentTableData;
+	private static final Vector<TableData> listOfTables = new Vector<TableData>();
+	
+	static final LinkedList<String> emptyArray = new LinkedList<String>();
+	
 	private static Matcher matcher;
 	private static boolean isNumberFounded;
+	private static boolean isIntermediaryTable; // SI PIVOT
 	private static boolean isInvalid;
 	private static Integer marker;
 	
@@ -93,6 +98,44 @@ public class Parser {
 			   currentLine.contains("references");
 	}
 	
+	
+	/**
+	 * isIntermediaryTableByIndex = detect if the parsed line is for a intermediary table
+	 * @param {String} currentLine
+	 * @return {boolean} the response
+	 */
+	private static boolean isIntermediaryTableByIndex(String currentLine) {
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logWarning("isIntermediaryTableByIndex()", "Empty line.");
+			return false;
+		}
+		
+//		if() {
+		
+		 for (Integer i = 0; i < currentLine.length(); i++) {
+
+			 currentCharacter.append(Character.toString(currentLine.charAt(i)));
+			 
+			 // Si l'on tombe apres le CREATE TABLE et l'espace	 
+			    if (i >= createTableStr.length()) {
+	
+			        // ... ET si l'on ne tombe pas sur la openParenthese ouvrante
+			        if (!(currentCharacter.toString().equals(openParenthese))) {
+			                 tableResult.append(currentCharacter.toString().trim());
+			        } else {
+			        	break; // force end loop if we match the parenthesis or other stuffs such as empty spaces etc 
+			        }
+			     }
+			    
+			    currentCharacter.setLength(0);
+			 }
+
+		isIntermediaryTable = false;
+		
+		return isIntermediaryTable;
+	}
+	
 	/**
 	 * isNullAttributeLine = detect if the parsed line is null
 	 * Strategy = we have to lower case all the line for a check (toLowerCase())  
@@ -102,7 +145,6 @@ public class Parser {
 	private static boolean isNullAttributeLine(String currentLine) {
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logWarning("isNullAttributeLine()", "Empty line.");
 			return false;
 		}
 		
@@ -121,7 +163,6 @@ public class Parser {
 	private static boolean isNotNullAttributeLine(String currentLine) {
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logWarning("isNotNullAttributeLine()", "Empty line.");
 			return false;
 		}
 		
@@ -137,7 +178,6 @@ public class Parser {
 	private static boolean isForeignKey(String currentLine) {
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logWarning("isForeignKey()", "Empty line.");
 			return false;
 		}
 		
@@ -152,7 +192,6 @@ public class Parser {
 	private static boolean isCommentLine(String currentLine) { 
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logWarning("isPrimaryKey()", "Empty line.");
 			return false;
 		}
 		
@@ -176,7 +215,6 @@ public class Parser {
 	private static boolean isEndOfTable(String currentLine) { 
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logWarning("isEndOfTable()", "Empty line.");
 			return false;
 		}
 		
@@ -192,7 +230,6 @@ public class Parser {
 	private static boolean isBooleanAttr(String currentLine) { 
 		
 		if (isLineEmpty(currentLine)) {
-			logger.logWarning("isBooleanAttr()", "Empty line.");
 			return false;
 		}
 		
@@ -414,21 +451,65 @@ public class Parser {
 		}
 	}
 	
-	public static void printTableName(String currentLine) {
+	public static String getTableName(String currentLine, Integer... number) {
 		
-    	if (currentLine.toString().startsWith(createTableStr)) {
-  
-    		out.println("------------------------------------");
-    		out.println("Table name : " + getTablenameByIndex(currentLine.toString()));
-    		out.println("------------------------------------");
-    	}
+		Integer temp = 0;
+		
+		if(number.length == 1) {
+			temp = number[0].intValue();
+		} else {
+			logger.logError("printTableName()", "You have entered more than one value");
+		}
+		
+//    	if (currentLine.toString().startsWith(createTableStr)) {
+//  
+//    		out.println("------------------------------------");
+//    		out.println("Table number " + temp + " : " + getTablenameByIndex(currentLine.toString()));
+//    		out.println("------------------------------------");
+//    	}
+    	
+    	return getTablenameByIndex(currentLine.toString());
 		
 	}
 	
-//	public static void printClassicTable(String currentLine) {
-//		
+	
+//	private static TableData getTable() {
+//        	
+//        	currentLine.append(scanner.nextLine());
+//        	
+//        	if (!isCommentLine(currentLine.toString()) && !isLineEmpty(currentLine.toString())) {
+//        		
+//            	if (currentLine.toString().startsWith(createTableStr)) {
+//            		
+//            		
+//	        	}
+//            	
+//            	if (i > marker && !isEndOfTable(currentLine.toString())) {
+//	            	String temp = currentLine.toString();
+//	            	
+//	            	if(!isConstraintLine(temp)) {
+//	            		printAttributeDatas(temp);
+//	            	}
+//            	}
+//            
+//        	}
+//     
+//		return currentTableData;
 //	}
 	
+	public static void printTableDatas(Vector<TableData> array) {
+		
+        for (TableData table : array) {
+      	  
+        	out.println("------------------------------------");
+        	out.println("tableName : " + table.getTableName());
+        	out.println("isPivot : " + table.isPivot());
+        	out.println("attributeList : " + table.getAttributeList());
+        	out.println("typesList : " + table.getTypesList());
+        	out.println("foreignKeyList : " + table.getForeignKeyList());
+       }
+		
+	}
 	
 	
 	// --------------------- PARSE --------------------- //
@@ -437,14 +518,18 @@ public class Parser {
 		
 		try {
 			
-	        File jMeriseSQL = new File("./labo-test/DBQ10.sql");
+	        File jMeriseSQL = new File("./labo-test/DBQ7.sql");
+	        
+//	        String pathToFile = jMeriseSQL.getAbsolutePath().toString(); // obtenir le path absolu du fichier
+//	        out.println("PATH : " + pathToFile);
+	        
 	        Scanner scanner = new Scanner(jMeriseSQL);
 	        
 	        int i = 0;
 	        marker = 9999;
 	        int nbTables = 0;
-	        
 	        initStrings();
+	        listOfTables.clear();
 	       
 	        while(scanner.hasNextLine()) {
 	        	
@@ -454,26 +539,45 @@ public class Parser {
 	        		
 	            	if (currentLine.toString().startsWith(createTableStr)) {
 	            		
+	            		currentTableData = new TableData();
+	            		currentTableData.setTableName(getTableName(currentLine.toString(), nbTables));
 	            		nbTables++;
-	            		out.println("Table number : " + nbTables);
-	            		printTableName(currentLine.toString());
 	            		marker = i;
 		        	}
 	            	
-	            	if (i > marker && !isEndOfTable(currentLine.toString())) {
-		            	String temp = currentLine.toString();
+	            	if ((i > marker) && !isEndOfTable(currentLine.toString())) {
+		            	
+	            		String temp = currentLine.toString();
 		            	
 		            	if(!isConstraintLine(temp)) {
-		            		printAttributeDatas(temp);
+		                		
+		            		currentTableData.pushInAttributeList(getAttributeName(temp));
+		            		currentTableData.pushInTypesList(getTypeOfAttribute(temp));
+		            		
+		            		listOfTables.add(currentTableData);
+		            		
+//		            		if(isForeignKey(temp)) {
+//		            			// PUSH IN foreignKeyList ARRAY
+//		            		}
 		            	}
 	            	}
 	            
 	        	}
 	        	
 	        	i++;
+	        	
+//	        	currentTableData.setAttributeList(emptyArray);
+//	        	currentTableData.setForeignKeyList(emptyArray);
+//	        	currentTableData.setPivot(emptyArray);
+//	        	currentTableData.setTypesList(null);
+//	        	currentTableData.setTableName("");
+	        	
 	        	currentLine.setLength(0);
 	        }
-			
+	        
+	        printTableDatas(listOfTables);
+	        out.println("LENGTH" + listOfTables.size());
+	        
 		} catch (Exception e) {
 			logger.logError("parseTEST()", e.getMessage());
 		}

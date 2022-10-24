@@ -24,7 +24,7 @@ import static java.lang.System.*;
 		private static final String databaseName ="fake_database";
 		private static final String url = "jdbc:mariadb://localhost:3306/";
 		private static final String user ="root"; // The main user in MariaDB
-		private static final String pwd ="password01"; // Type your password
+		private static final String pwd =""; // Type your password
 		
 		// Utils
 		private static final GeneratorLogger logger = new GeneratorLogger();

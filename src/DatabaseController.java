@@ -20,15 +20,19 @@ import static java.lang.System.*;
  */
 	public class DatabaseController {
 		
+		// Credentials (in clear for the moment)
 		private static final String databaseName ="fake_database";
 		private static final String url = "jdbc:mariadb://localhost:3306/";
 		private static final String user ="root"; // The main user in MariaDB
-		private static final String pwd =""; // Type your password 
+		private static final String pwd ="password01"; // Type your password
 		
+		// Utils
+		private static final GeneratorLogger logger = new GeneratorLogger();
+		private static final Vector<String> dataVector = new Vector<String>();
+		
+		// DB
 		private static Connection connection;
 		private static PreparedStatement statement;
-		
-		private GeneratorLogger logger = new GeneratorLogger();
 		
 		/**
 		 * callSearchDatasProcedure() - Call the main procedure in database
@@ -36,8 +40,6 @@ import static java.lang.System.*;
 		 * @param {int} limit
 		 */
 		public void callSearchDatasProcedure(String tableToSearch, int limit) {
-			
-			Vector<String> dataVector = new Vector<String>();
 				
 			try {	
 				
@@ -72,9 +74,7 @@ import static java.lang.System.*;
 		 * @param {int} max
 		 */
 		public void callGenerateRandomNumber(int min, int max) {
-			
-//			Vector<String> dataVector = new Vector<String>();
-				
+							
 			try {	
 				
 					statement = connection.prepareStatement("{call generate_random_number(?,?);}");

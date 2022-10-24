@@ -1,14 +1,14 @@
+CREATE TABLE Cours(
+   Id_Cours INT AUTO_INCREMENT,
+   Nom_Cours VARCHAR(255) NOT NULL,
+   Nombre_Seance TINYINT NOT NULL,
+   PRIMARY KEY(Id_Cours)
+);
+
 CREATE TABLE Annee_Scolaire(
    Id_AnneeScolaire INT AUTO_INCREMENT,
    Annee_Scolaire VARCHAR(12) NOT NULL,
    PRIMARY KEY(Id_AnneeScolaire)
-);
-
-CREATE TABLE Cours(
-   Id_Cours INT AUTO_INCREMENT,
-   Nom_Cours VARCHAR(50) NOT NULL,
-   Nombre_Seance TINYINT NOT NULL,
-   PRIMARY KEY(Id_Cours)
 );
 
 CREATE TABLE Section(

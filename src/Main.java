@@ -40,18 +40,21 @@ public class Main {
         
         try {
         	   	
-            isLogged = database.createConnection();
-            
-            if (isLogged) {
-            	
-//            	database.callSearchDatasProcedure("phone", 50); <= Decommenter pour tester
-//            	database.callGenerateRandomNumber(10, 10000); <= Decommenter pour tester
-            } else {
-            	logger.logError("createConnection()", "Error on connexion to database.");
-            }
+//            isLogged = database.createConnection();
+//            
+//            if (isLogged) {
+//            	
+//            	database.callSearchDatasProcedure("phone", 50); // <= Decommenter pour tester
+//            	database.callGenerateRandomNumber(10, 10000); // <= Decommenter pour tester
+//            	
+//            } else {
+//            	logger.logError("createConnection()", "Error on connexion to database.");
+//            }
         
+//            helper.clearConsole();
+//            menus.printMariaTypes();
         	parser.parseTEST();
-        	
+          
         } catch (Exception e) {
         	logger.logError("Main()", e.getMessage());			
 		}		

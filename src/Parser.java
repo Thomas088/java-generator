@@ -16,15 +16,27 @@ import java.util.Map;
  */
 public class Parser {
 	
+//	(static final) java => const (javascript, php, python...)
+	
 	private static final Helpers helper = new Helpers();
 	private static final GeneratorLogger logger = new GeneratorLogger();
 	private static final String createTableStr = "CREATE TABLE ";
-	private static final String parenthese = "(";
+	private static final String openParenthese = "(";
+	private static final String closeParenthese = ")";
+	private static final String newline = "\n";
 	private static final StringBuilder tableResult = new StringBuilder();
+	private static final StringBuilder numberResult = new StringBuilder();
 	private static final StringBuilder attrResult = new StringBuilder();
+	private static final StringBuilder attrType = new StringBuilder();
 	private static final StringBuilder currentAttr = new StringBuilder();
 	private static final StringBuilder currentLine = new StringBuilder();
 	private static final StringBuilder currentCharacter = new StringBuilder();
+	private static final RegexRepertory regexRepertory = new RegexRepertory();
+	
+	private static Matcher matcher;
+	private static boolean isNumberFounded;
+	private static boolean isInvalid;
+	private static Integer marker;
 	
 	// INIT
 	
@@ -33,11 +45,13 @@ public class Parser {
 	 */
 	private static void initStrings() {
 		
+		numberResult.setLength(0);
 		tableResult.setLength(0);
 		attrResult.setLength(0);
 		currentAttr.setLength(0);
-		currentCharacter.setLength(0);
 		currentLine.setLength(0);
+		currentCharacter.setLength(0);
+		attrType.setLength(0);
 	}
 	
 	// ------------------ PARSER HELPERS ----------------------- // 
@@ -49,6 +63,12 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isPrimaryKey(String currentLine) {
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("isPrimaryKey()", "Empty line.");
+			return false;
+		}
+		
 		return currentLine.trim().toLowerCase().contains("auto_increment");
 	}
 	
@@ -59,6 +79,11 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isConstraintLine(String currentLine) {
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("isConstraintLine()", "Empty line.");
+			return false;
+		}
 		
 		currentLine = currentLine.trim().toLowerCase();
 		
@@ -75,7 +100,16 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isNullAttributeLine(String currentLine) {
-		return currentLine.trim().toLowerCase().contains("null");
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("isNullAttributeLine()", "Empty line.");
+			return false;
+		}
+		
+		currentLine = currentLine.trim().toLowerCase();
+		
+		return currentLine.contains("null") && 
+			  !currentLine.contains("not null");
 	}
 	
 	/**
@@ -85,6 +119,12 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isNotNullAttributeLine(String currentLine) {
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("isNotNullAttributeLine()", "Empty line.");
+			return false;
+		}
+		
 		return currentLine.trim().toLowerCase().contains("not null");
 	}
 	
@@ -95,6 +135,12 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isForeignKey(String currentLine) {
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("isForeignKey()", "Empty line.");
+			return false;
+		}
+		
 		return currentLine.trim().toLowerCase().contains("foreign key");
 	}
 	
@@ -104,6 +150,12 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isCommentLine(String currentLine) { 
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("isCommentLine()", "Empty line.");
+			return false;
+		}
+		
 		return currentLine.trim().startsWith("#");
 	}
 	
@@ -122,10 +174,33 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isEndOfTable(String currentLine) { 
-		return currentLine.trim().startsWith(")ENGINE=InnoDB;") || currentLine.trim().contains(");");
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("isEndOfTable()", "Empty line.");
+			return false;
+		}
+		
+		return currentLine.trim().startsWith(")ENGINE=InnoDB;") || 
+			   currentLine.trim().contains(");");
 	}
 	
+	/**
+	 * isBoolean = detect if the parsed line is a boolean attribute (format: 'boolean' | 'bool')
+	 * @param {String} currentLine
+	 * @return {boolean} the response 
+	 */
+	private static boolean isBooleanAttr(String currentLine) { 
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("isBooleanAttr()", "Empty line.");
+			return false;
+		}
+		
+		return currentLine.toLowerCase().trim().contains("BOOLEAN") || 
+			   currentLine.toLowerCase().trim().contains("BOOL");
+	}
 	
+
 	// ------------------ GENERAL METHODS ----------------------- // 
 	
 	// ------------------ TABLES ----------------------- //
@@ -139,15 +214,15 @@ public class Parser {
 		
 		initStrings();
 		
-		 for (int i = 0; i < currentLine.length(); i++) {
+		 for (Integer i = 0; i < currentLine.length(); i++) {
 
 			 currentCharacter.append(Character.toString(currentLine.charAt(i)));
 			 
 			 // Si l'on tombe apres le CREATE TABLE et l'espace	 
 			    if (i >= createTableStr.length()) {
 	
-			        // ... ET si l'on ne tombe pas sur la parenthese ouvrante
-			        if (!(currentCharacter.toString().equals(parenthese))) {
+			        // ... ET si l'on ne tombe pas sur la openParenthese ouvrante
+			        if (!(currentCharacter.toString().equals(openParenthese))) {
 			                 tableResult.append(currentCharacter.toString().trim());
 			        } else {
 			        	break; // force end loop if we match the parenthesis or other stuffs such as empty spaces etc 
@@ -173,12 +248,11 @@ public class Parser {
         Matcher createTableMatcher = createTablePattern.matcher(currentLine);
          
         if (createTableMatcher.find()) {
-        	tableResult.append(currentLine.replaceAll(createTableStr, "").replace(parenthese, "").trim()) ;
+        	tableResult.append(currentLine.replaceAll(createTableStr, "").replace(openParenthese, "").trim()) ;
         }
 		
         return tableResult.toString();
 	}	
-	
 	
 	// ------------------ ATTRIBUTES ----------------------- //
 	
@@ -189,9 +263,14 @@ public class Parser {
 	 */
 	private static String getAttributeName(String currentLine) {
 		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("getAttributeName()", "Empty line.");
+			return "";
+		}
+		
 		initStrings();
 		
-		for (int i = 0; i < currentLine.length(); i++) {
+		for (Integer i = 0; i < currentLine.length(); i++) {
 			
 			currentCharacter.append(currentLine.charAt(i));
 			
@@ -220,6 +299,11 @@ public class Parser {
 	 */
 	private static String getTypeOfAttribute(String currentLine) {
 		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("getLengthOfVarchar()", "Empty line.");
+			return "";
+		}
+		
 		initStrings();
 		
 		for (EnumList.mariaAttributeTypesListEnum attribute : EnumList.mariaAttributeTypesListEnum.values()) {
@@ -237,14 +321,95 @@ public class Parser {
 		return attrResult.toString();
 	}
 	
+	/**
+	 * getLengthOfVarcharByIndex() => Get the length of the current attribute (INDEX VERSION)
+	 * @param currentLine
+	 * @return
+	 */
+	private static Integer getLengthOfVarcharByIndex(String currentLine) {
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("getLengthOfVarchar()", "Empty line.");
+			return 0;
+		}
+		
+		initStrings();
+		marker = 9999; // Set the market on the first time like this (for later)
+		
+		String strTemp = getTypeOfAttribute(currentLine.toLowerCase().trim());
+		currentAttr.setLength(0);
+		currentAttr.append(strTemp);
+		
+		String varchar = EnumList.mariaAttributeTypesListEnum.VARCHAR.getName().trim().toLowerCase();
+		
+			if (currentAttr.toString().equals(varchar)) {
+		
+				for (Integer i = 0; i < currentLine.length(); i++) {
+					
+					if (Character.toString(currentLine.charAt(i)).equals(openParenthese)) {
+						marker = i; // Set the new marker here
+					}  
+					
+					if (i > marker && !Character.toString(currentLine.charAt(i)).equals(closeParenthese)) {
+						numberResult.append(Character.toString(currentLine.charAt(i)));
+					}
+					
+					if (Character.toString(currentLine.charAt(i)).equals(closeParenthese)) {
+						break; // We already get the length	
+					}
+				}
+			
+			}
+			
+		return Integer.parseInt(numberResult.toString().trim());
+	}
+	
+	/**
+	 * getLengthOfVarcharByRegex() => Get the length of the current attribute (REGEX VERSION)
+	 * @param currentLine
+	 * @return
+	 */
+	private static Integer getLengthOfVarcharByRegex(String currentLine) {
+		
+		if (isLineEmpty(currentLine)) {
+			logger.logError("getLengthOfVarchar()", "Empty line.");
+			return 0;
+		}
+	
+		String strTemp = getTypeOfAttribute(currentLine.toLowerCase().trim());
+		currentAttr.setLength(0);
+		currentAttr.append(strTemp);
+		
+		String varchar = EnumList.mariaAttributeTypesListEnum.VARCHAR.getName().trim().toLowerCase();
+		
+			if (currentAttr.toString().equals(varchar)) {
+				
+				matcher = regexRepertory.getNumbersPattern().matcher(currentLine);
+				isNumberFounded = matcher.find();
+				
+				if (isNumberFounded) {
+					numberResult.append(matcher.group(0));
+				}		
+			}
+			
+		return Integer.parseInt(numberResult.toString().trim());
+	}
+	
 	private static void printTableDatas(String currentLine) {
 		
-    	boolean isNull = isNullAttributeLine(currentLine) || !isNotNullAttributeLine(currentLine);
+    	boolean isNull = isNullAttributeLine(currentLine);
     	boolean isKey = isPrimaryKey(currentLine) || isForeignKey(currentLine);
+    	
+    	currentAttr.append(getAttributeName(currentLine));
     	
 		out.println("Attribute name : " + getAttributeName(currentLine));
 		out.println("Attribute type : " + getTypeOfAttribute(currentLine));
-		out.println("Attribute NULL ? : " + ( (isKey || !isNull) ? "No" : "Yes") );
+		out.println("Attribute NULL ? : " + ((isKey || !isNull) ? "No" : "Yes"));
+		
+		if (currentAttr.toString().toLowerCase().equals(EnumList.mariaAttributeTypesListEnum.VARCHAR.getName().toLowerCase())) {
+			out.println("Attribute length (INDEX) : " + getLengthOfVarcharByIndex(currentLine));
+			out.println("Attribute length (REGEX) : " + getLengthOfVarcharByRegex(currentLine));
+		}
 	}
 	
 	
@@ -258,7 +423,7 @@ public class Parser {
 	        Scanner scanner = new Scanner(jMeriseSQL);
 	        
 	        int i = 1;
-	        int startMark = 1;
+	        marker = 1;
 	        int nbTables = 0;
 	        
 	        initStrings();
@@ -275,10 +440,10 @@ public class Parser {
 	            		out.println("------------------------------------");
 	            		out.println("Table number " + nbTables + " : " + getTablenameByIndex(currentLine.toString()));
 	            		out.println("------------------------------------");
-		        		startMark = i;
+		        		marker = i;
 		        	}
 	            	
-		        	if (i > startMark) {
+		        	if (i > marker) {
 		        		
 			        	if (isEndOfTable(currentLine.toString())) {
 			        		break;
@@ -286,7 +451,7 @@ public class Parser {
 			        	
 			        	String temp = currentLine.toString();
 			        	        	
-	    				if(!isConstraintLine(temp)) {			
+	    				if (!isConstraintLine(temp)) {			
 	    					printTableDatas(temp);
 	    				}
 
@@ -298,7 +463,7 @@ public class Parser {
 	        }
 			
 		} catch (Exception e) {
-			logger.logError("parsingTEST()", e.getMessage());
+			logger.logError("parseTEST()", e.getMessage());
 		}
 	}    
  }  

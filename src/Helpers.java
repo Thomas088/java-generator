@@ -19,7 +19,7 @@ public class Helpers {
 	private static final StringBuilder inputCurrentValue = new StringBuilder();
 	private static final RegexRepertory regexRepertory = new RegexRepertory();
 	private static final GeneratorLogger logger = new GeneratorLogger();
-	private static Matcher matcher;
+	private static Matcher matcher; // not final because different regex evaluated in different helpers 
 	
 	private static boolean isLetterFounded;
 	private static boolean isNumberFounded;
@@ -41,7 +41,7 @@ public class Helpers {
 		
 		String dateStr = "";
 		
-		for (int i = 0; i < date.length; i++) {
+		for (Integer i = 0; i < date.length; i++) {
 			dateStr += date[i] + ((i != date.length - 1) ? "-" : "");
 		}
 		
@@ -302,12 +302,17 @@ public class Helpers {
 	 * @throws {Exception}
 	 */
 	public static void clearConsole() throws Exception {
+		
+		out.println("SCREEN CLEARED");
+		
 	    try {
 
-	     if (System.getProperty("os.name").contains("Windows"))
+	     if (System.getProperty("os.name").contains("Windows")) {
 	         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-	     else
-	         Runtime.getRuntime().exec("clear");
+	     	 out.println('\n');
+	     } else {
+	    	 Runtime.getRuntime().exec("clear");
+	     }    
 	    } catch (IOException | InterruptedException ex) {
 	    	throw ex;
 	    }

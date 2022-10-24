@@ -10,18 +10,31 @@ import java.util.Map;
 public class EnumList {
 	
 	// MAKE AN ENUM FOR DISPLAY ALL TYPES
-	public enum mariaAttributeTypesListEnum {
+	// NOT EXHAUSTIVE
+	public enum mariaAttributeTypesListEnum { 
 		
 		INT("INT"),
+		BIGINT("BIGINT"),
+		AUTO_INCREMENT("AUTO_INCREMENT"),
 		TINYINT("TINYINT"),
+		TINYTEXT("TINYTEXT"),
+		BLOB("BLOB"),
+		TEXT("TEXT"),
 		SMALLINT("SMALLINT"),
 		FLOAT("FLOAT"),
+		DOUBLE("DOUBLE"),
 		VARCHAR("VARCHAR"),
+		DATE("DATE"),
+		TIME("TIME"),
+		DATETIME("DATETIME"),
+		TIMESTAMP("TIMESTAMP"),
+		BOOL("BOOL"),
 		BOOLEAN("BOOLEAN");
 
 		private String currentType;
 	    private static Map<String, mariaAttributeTypesListEnum> MARIA_TYPES_MAP;
 
+	    // ENUM CONSTRUCTOR
 	    mariaAttributeTypesListEnum(String currentType) {
 	        this.currentType = currentType.trim() ;
 	    }
@@ -33,6 +46,7 @@ public class EnumList {
 	    static {
 	    	
 	        Map<String, mariaAttributeTypesListEnum> mariaTypesMap = new HashMap<String, mariaAttributeTypesListEnum>();
+	        
 	        for (mariaAttributeTypesListEnum type : mariaAttributeTypesListEnum.values()) {
 	        	mariaTypesMap.put(type.getName().toLowerCase(), type); // on lie le nom du type avec son l'enum associe
 	        }

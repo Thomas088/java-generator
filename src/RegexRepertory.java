@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  */
 public class RegexRepertory {
 	
-	private static final Pattern lettersPattern = Pattern.compile("[a-zA-Z]+", Pattern.CASE_INSENSITIVE);
+	private static final Pattern lettersPattern = Pattern.compile("[a-z]+", Pattern.CASE_INSENSITIVE);
 	private static final Pattern numbersPattern = Pattern.compile("[0-9]+");
 	private static final Pattern specialCharactersPattern = Pattern.compile("^[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,.<>\\/?]*$");
 	private static final Pattern specialCharactersWithoutDotPattern = Pattern.compile("^[!@#$%^&*()_+\\-=\\[\\]{};':\"\\\\|,<>\\/?]*$");
@@ -15,7 +15,7 @@ public class RegexRepertory {
 	private static final Pattern emailStrictRegex = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)*(\\\\.[A-Za-z]{2,})$");
 	private static final Pattern phoneRegex = Pattern.compile("^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$");
 	private static final Pattern singleDotForDecimals = Pattern.compile("[.]{1}");
-
+	
 	/**
 	 * getLettersPattern() = get the (only) letters pattern
 	 * @return {Pattern} the regex pattern

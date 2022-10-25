@@ -54,7 +54,7 @@ import static java.lang.System.*;
 			databaseName.append("fake_database");
 			url.append("jdbc:mariadb://localhost:3306/");
 	    	user.append("root");
-	    	pwd.append("Vinyjeff");
+	    	pwd.append("");
 			
 		}
 		

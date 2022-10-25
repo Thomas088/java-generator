@@ -22,7 +22,7 @@ public class Main {
 		
 		// IMPORT DES AUTRES CLASSES NECESSAIRE AU MENU
 		MenuDisplays menus = new MenuDisplays();
-		Parser parser = new Parser();
+	    Parser parser = new Parser();
 	    Helpers helper = new Helpers();
 		DatabaseController database = new DatabaseController();
 		GeneratorLogger logger = new GeneratorLogger();
@@ -50,7 +50,7 @@ public class Main {
 //            	logger.logError("createConnection()", "Error on connexion to database.");
 //            }
  
-        	parser.parseTEST();
+        	parser.parse("./labo-test/DBQ7.sql");
           
         } catch (Exception e) {
         	logger.logError("Main()", e.getMessage());			

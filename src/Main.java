@@ -22,14 +22,14 @@ public class Main {
 		
 		// IMPORT DES AUTRES CLASSES NECESSAIRE AU MENU
 		MenuDisplays menus = new MenuDisplays();
-		Parser parser = new Parser();
+	    Parser parser = new Parser();
 	    Helpers helper = new Helpers();
 		DatabaseController database = new DatabaseController();
 		GeneratorLogger logger = new GeneratorLogger();
 		
 		boolean isLogged = false;
 		
-		LinkedList<TableData> listOfTables = new LinkedList<TableData>();
+//		LinkedList<TableData> listOfTables = new LinkedList<TableData>();
 		TableData currentTable = null;
 		
         String userInput = "";
@@ -44,16 +44,13 @@ public class Main {
 //            
 //            if (isLogged) {
 //            	
-//            	database.callSearchDatasProcedure("phone", 50); // <= Decommenter pour tester
-//            	database.callGenerateRandomNumber(10, 10000); // <= Decommenter pour tester
+//            	database.callSearchDatasProcedure("address", 50); // <= Decommenter pour tester
 //            	
 //            } else {
 //            	logger.logError("createConnection()", "Error on connexion to database.");
 //            }
-        
-//            helper.clearConsole();
-//            menus.printMariaTypes();
-        	parser.parseTEST();
+ 
+        	parser.parse("./labo-test/DBQ7.sql");
           
         } catch (Exception e) {
         	logger.logError("Main()", e.getMessage());			

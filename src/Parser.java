@@ -1,29 +1,21 @@
 import static java.lang.System.*;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 /**
- * Parser => Class for parsing a JMerise of Looping .sql file
+ * Parser => Class for parsing a JMerise or Looping .sql file
  * @author Utilisateur
  *
  */
 public class Parser {
 	
-//	(static final) java => const (javascript, php, python...)
-	
-	private static final Helpers helper = new Helpers();
+    //	static final (java) = const (javascript, php, python...)
 	private static final GeneratorLogger logger = new GeneratorLogger();
-	private static final String createTableStr = "CREATE TABLE ";
-	private static final String openParenthese = "(";
-	private static final String closeParenthese = ")";
-	private static final String newline = "\n";
 	private static final StringBuilder tableResult = new StringBuilder();
 	private static final StringBuilder numberResult = new StringBuilder();
 	private static final StringBuilder attrResult = new StringBuilder();
@@ -32,11 +24,24 @@ public class Parser {
 	private static final StringBuilder currentLine = new StringBuilder();
 	private static final StringBuilder currentCharacter = new StringBuilder();
 	private static final RegexRepertory regexRepertory = new RegexRepertory();
+	private static final Vector<TableData> listOfTables = new Vector<TableData>();	
+	private static final String createTableStr = "CREATE TABLE ";
+	private static final String openParenthese = "(";
+	private static final String closeParenthese = ")";
+	private static final String virgule = ",";
 	
-	private static Matcher matcher;
+	// Not final because we want new arrays in parsing loop
+	private static LinkedList<String> arrayAttributeTemp;
+	private static LinkedList<String> arrayTypeTemp;
+	
 	private static boolean isNumberFounded;
-	private static boolean isInvalid;
 	private static Integer marker;
+	private static Integer i;
+	private static Matcher matcher;	
+	private static String temp;
+	private static String tableName;
+	private static String attribute;
+	private static String type;
 	
 	// INIT
 	
@@ -62,13 +67,7 @@ public class Parser {
 	 * @param {String} currentLine
 	 * @return {boolean} the response
 	 */
-	private static boolean isPrimaryKey(String currentLine) {
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("isPrimaryKey()", "Empty line.");
-			return false;
-		}
-		
+	private static boolean isPrimaryKey(String currentLine) {	
 		return currentLine.trim().toLowerCase().contains("auto_increment");
 	}
 	
@@ -79,11 +78,6 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isConstraintLine(String currentLine) {
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("isConstraintLine()", "Empty line.");
-			return false;
-		}
 		
 		currentLine = currentLine.trim().toLowerCase();
 		
@@ -101,11 +95,6 @@ public class Parser {
 	 */
 	private static boolean isNullAttributeLine(String currentLine) {
 		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("isNullAttributeLine()", "Empty line.");
-			return false;
-		}
-		
 		currentLine = currentLine.trim().toLowerCase();
 		
 		return currentLine.contains("null") && 
@@ -118,13 +107,7 @@ public class Parser {
 	 * @param {String} currentLine
 	 * @return {boolean} the response
 	 */
-	private static boolean isNotNullAttributeLine(String currentLine) {
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("isNotNullAttributeLine()", "Empty line.");
-			return false;
-		}
-		
+	private static boolean isNotNullAttributeLine(String currentLine) {	
 		return currentLine.trim().toLowerCase().contains("not null");
 	}
 	
@@ -135,12 +118,6 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isForeignKey(String currentLine) {
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("isForeignKey()", "Empty line.");
-			return false;
-		}
-		
 		return currentLine.trim().toLowerCase().contains("foreign key");
 	}
 	
@@ -150,12 +127,6 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isCommentLine(String currentLine) { 
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("isCommentLine()", "Empty line.");
-			return false;
-		}
-		
 		return currentLine.trim().startsWith("#");
 	}
 	
@@ -174,12 +145,6 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isEndOfTable(String currentLine) { 
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("isEndOfTable()", "Empty line.");
-			return false;
-		}
-		
 		return currentLine.trim().startsWith(")ENGINE=InnoDB;") || 
 			   currentLine.trim().contains(");");
 	}
@@ -189,13 +154,7 @@ public class Parser {
 	 * @param {String} currentLine
 	 * @return {boolean} the response 
 	 */
-	private static boolean isBooleanAttr(String currentLine) { 
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("isBooleanAttr()", "Empty line.");
-			return false;
-		}
-		
+	private static boolean isBooleanAttr(String currentLine) { 	
 		return currentLine.toLowerCase().trim().contains("BOOLEAN") || 
 			   currentLine.toLowerCase().trim().contains("BOOL");
 	}
@@ -223,7 +182,7 @@ public class Parser {
 	
 			        // ... ET si l'on ne tombe pas sur la openParenthese ouvrante
 			        if (!(currentCharacter.toString().equals(openParenthese))) {
-			                 tableResult.append(currentCharacter.toString().trim());
+			                 tableResult.append(currentCharacter.toString());
 			        } else {
 			        	break; // force end loop if we match the parenthesis or other stuffs such as empty spaces etc 
 			        }
@@ -232,7 +191,7 @@ public class Parser {
 			    currentCharacter.setLength(0);
 			 }
 		 
-		return tableResult.toString();
+		return tableResult.toString().trim();
 	}
 	
 	/**
@@ -249,6 +208,8 @@ public class Parser {
          
         if (createTableMatcher.find()) {
         	tableResult.append(currentLine.replaceAll(createTableStr, "").replace(openParenthese, "").trim()) ;
+        } else {
+        	logger.logWarning("getTablenameByRegex()", "No match.");
         }
 		
         return tableResult.toString();
@@ -262,12 +223,7 @@ public class Parser {
 	 * @return {String} the attribute parsed
 	 */
 	private static String getAttributeName(String currentLine) {
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("getAttributeName()", "Empty line.");
-			return "";
-		}
-		
+	
 		initStrings();
 		
 		for (Integer i = 0; i < currentLine.length(); i++) {
@@ -318,7 +274,7 @@ public class Parser {
 			currentAttr.setLength(0);
 		}
 		
-		return attrResult.toString();
+		return attrResult.toString().trim();
 	}
 	
 	/**
@@ -380,7 +336,7 @@ public class Parser {
 		currentAttr.setLength(0);
 		currentAttr.append(strTemp);
 		
-		String varchar = EnumList.mariaAttributeTypesListEnum.VARCHAR.getName().trim().toLowerCase();
+		String varchar = EnumList.mariaAttributeTypesListEnum.VARCHAR.getName().toLowerCase().trim();
 		
 			if (currentAttr.toString().equals(varchar)) {
 				
@@ -395,7 +351,7 @@ public class Parser {
 		return Integer.parseInt(numberResult.toString().trim());
 	}
 	
-	private static void printTableDatas(String currentLine) {
+	private static void printAttributeDatas(String currentLine) {
 		
     	boolean isNull = isNullAttributeLine(currentLine);
     	boolean isKey = isPrimaryKey(currentLine) || isForeignKey(currentLine);
@@ -404,7 +360,7 @@ public class Parser {
     	
 		out.println("Attribute name : " + getAttributeName(currentLine));
 		out.println("Attribute type : " + getTypeOfAttribute(currentLine));
-		out.println("Attribute NULL ? : " + ((isKey || !isNull) ? "No" : "Yes"));
+		out.println("Attribute NULL ? : " + (isKey || !isNull));
 		
 		if (currentAttr.toString().toLowerCase().equals(EnumList.mariaAttributeTypesListEnum.VARCHAR.getName().toLowerCase())) {
 			out.println("Attribute length (INDEX) : " + getLengthOfVarcharByIndex(currentLine));
@@ -412,55 +368,126 @@ public class Parser {
 		}
 	}
 	
+	public static String getTableName(String currentLine) {
+		
+    	if (currentLine.toString().startsWith(createTableStr)) {
+  
+    		out.println("------------------------------------");
+    		out.println("Table name : " + getTablenameByIndex(currentLine.toString()));
+    		out.println("------------------------------------");
+    		
+    	}
+    	
+    	return getTablenameByIndex(currentLine.toString());
+		
+	}
+	
+	public static void printArrayTableData(Vector<TableData> array) {
+		
+		if (array.size() == 0) {
+			return;
+		}
+		
+		Iterator<TableData> i = array.iterator();
+	
+	    while (i.hasNext()) {
+	    	  
+	    	TableData currentTable = ((TableData) i.next());
+	    	  
+        	out.println("------------------------------------");
+        	out.println("tableName : " + currentTable.getTableName());
+        	out.println("isPivot : " + currentTable.isPivot());
+        	out.println("attributeList : " + currentTable.getAttributeList());
+        	out.println("typesList : " + currentTable.getTypesList());
+        	out.println("foreignKeyList : " + currentTable.getForeignKeyList());
+	    }
+	}
+	
 	
 	// --------------------- PARSE --------------------- //
 	
-	public static void parseTEST() {
+	public void parse(String path) {
 		
-		try {
+	  try {
 			
-	        File jMeriseSQL = new File("./labo-test/DBQ10.sql");
+	        File jMeriseSQL = new File(path);   
 	        Scanner scanner = new Scanner(jMeriseSQL);
 	        
-	        int i = 1;
-	        marker = 1;
-	        int nbTables = 0;
-	        
+	        // [file] check if all is well configured
+	        if(!jMeriseSQL.exists()) {
+	        	
+	        	logger.logError("parse()", "The file not exists.");
+	        	scanner.close();
+	        	return;
+	        	
+	        } else if (!jMeriseSQL.canRead()) {
+	        	
+	        	logger.logError("parse()", "The file is unreadable.");
+	        	scanner.close();
+	        	return;
+	        } 
+	         
+	        i = 1; // we start like the .sql file
+	        marker = 9999;
+	    	TableData newTable = null;
+	    	
+	    	// init
 	        initStrings();
-	       
+	        listOfTables.clear();
+	      
 	        while(scanner.hasNextLine()) {
 	        	
+	        	// reset for the next line
+	        	currentLine.setLength(0);
 	        	currentLine.append(scanner.nextLine());
 	        	
-	        	if (!isCommentLine(currentLine.toString()) && !isLineEmpty(currentLine.toString())) {
+	        	temp = currentLine.toString();
+	        	
+	        	if (!isCommentLine(temp) && !isLineEmpty(temp)) {
 	        		
-	            	if (currentLine.toString().startsWith(createTableStr)) {
+	            	if (temp.startsWith(createTableStr)) {          		
+	            		tableName = getTablenameByIndex(temp);
+	            		marker = i;
 	            		
-	            		nbTables++;
-	            		out.println("------------------------------------");
-	            		out.println("Table number " + nbTables + " : " + getTablenameByIndex(currentLine.toString()));
-	            		out.println("------------------------------------");
-		        		marker = i;
-		        	}
+			  	    	// init arrays for the next table
+			  	    	arrayAttributeTemp = new LinkedList<String>();
+			  	    	arrayTypeTemp = new LinkedList<String>();
+		        	} 
 	            	
-		        	if (i > marker) {
-		        		
-			        	if (isEndOfTable(currentLine.toString())) {
-			        		break;
-		        	    }
-			        	
-			        	String temp = currentLine.toString();
-			        	        	
-	    				if (!isConstraintLine(temp)) {			
-	    					printTableDatas(temp);
-	    				}
-
-		        	}	
+	            	if (i > marker) { // we are in attribute list (because attribute is marker + 1)
+	            		
+		            	if(!isConstraintLine(temp)) {  // [DEBUG] - for the moment because the pivot tables is not yet handled
+	
+		            		if(!isEndOfTable(temp)) { 
+        		
+			            		attribute = getAttributeName(temp);
+			            		type = getTypeOfAttribute(temp);
+			   
+			            		arrayAttributeTemp.add(attribute);
+			            		arrayTypeTemp.add(type);
+			            		
+			            	} else {
+			            		
+		            			// Prepare new tableData and push to list
+			            		newTable = new TableData();
+			            		newTable.setTableName(tableName);    	
+			            		newTable.setAttributeList(arrayAttributeTemp);
+			            		newTable.setTypesList(arrayTypeTemp);
+			            		
+			            		listOfTables.add(newTable);
+			        
+			            		marker = 0; // Reset for the next new table	
+			            	} 		
+			            }	 
+	            	}	
 	        	}
 	        	
-	        	i++;
-	        	currentLine.setLength(0);
+	          i++;
 	        }
+	      
+			printArrayTableData(listOfTables);
+			out.println("ARRAY LENGTH : " + listOfTables.size());
+			scanner.close();
 			
 		} catch (Exception e) {
 			logger.logError("parseTEST()", e.getMessage());

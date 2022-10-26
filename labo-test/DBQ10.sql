@@ -7,22 +7,22 @@ CREATE TABLE Cours(
 
 CREATE TABLE Annee_Scolaire(
    Id_AnneeScolaire INT AUTO_INCREMENT,
-   Annee_Scolaire VARCHAR(12) NOT NULL,
+   Annee_Scolaire VARCHAR(999) NOT NULL,
    PRIMARY KEY(Id_AnneeScolaire)
 );
 
 CREATE TABLE Section(
    Id_Section INT AUTO_INCREMENT,
-   Nom_Section VARCHAR(50) NOT NULL,
-   Degres_Section VARCHAR(50) NOT NULL,
-   Nom_Titulaire VARCHAR(50) NOT NULL,
+   Nom_Section VARCHAR(123) NOT NULL,
+   Degres_Section VARCHAR(690) NOT NULL,
+   Nom_Titulaire VARCHAR(470) NOT NULL,
    PRIMARY KEY(Id_Section)
 );
 
 CREATE TABLE Localite(
    Id_Localite INT AUTO_INCREMENT,
    Code_Postale SMALLINT NOT NULL,
-   Localite VARCHAR(40) NOT NULL,
+   Localite VARCHAR(255) NOT NULL,
    PRIMARY KEY(Id_Localite)
 );
 
@@ -61,12 +61,13 @@ CREATE TABLE Etudiant(
 
 CREATE TABLE Seances(
    Id_Seance INT AUTO_INCREMENT,
-   Numero_Seance VARCHAR(20) NOT NULL,
+   Numero_Seance VARCHAR(200000) NOT NULL,
    Id_Cours_Organises INT NOT NULL,
    PRIMARY KEY(Id_Seance),
    FOREIGN KEY(Id_Cours_Organises) REFERENCES Cours_Organises(Id_Cours_Organises)
 );
 
+# ----------------------- PIVOTS --------------------- 
 CREATE TABLE R_Section_Cours(
    Id_Cours INT,
    Id_Section INT,
@@ -96,7 +97,7 @@ CREATE TABLE R_Etudiant_CoursOrganises(
    Id_Etudiant INT,
    Id_Cours_Organises INT,
    Inscrit BOOLEAN NOT NULL,
-   PRIMARY KEY(Id_Etudiant, Id_Cours_Organises),
+   PRIMARY KEY(Id_Etudiant,Id_Cours_Organises),
    FOREIGN KEY(Id_Etudiant) REFERENCES Etudiant(Id_Etudiant),
    FOREIGN KEY(Id_Cours_Organises) REFERENCES Cours_Organises(Id_Cours_Organises)
 );

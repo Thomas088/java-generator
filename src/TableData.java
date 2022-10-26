@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.LinkedList;
 
 public class TableData {
 
@@ -10,9 +11,7 @@ public class TableData {
 	
 	private boolean isPivot;
 
-
-	public TableData() 
-	{
+	public TableData() {
 		this.tableName = " ";
 		this.isPivot = false;
 		

@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Vector;
 import java.lang.StringBuilder;
 
 /**
@@ -26,15 +27,14 @@ public class Main {
 	    Helpers helper = new Helpers();
 		DatabaseController database = new DatabaseController();
 		GeneratorLogger logger = new GeneratorLogger();
+		Vector<TableData> listOfTables = new Vector<TableData>();
 		
 		boolean isLogged = false;
 		
-//		LinkedList<TableData> listOfTables = new LinkedList<TableData>();
 		TableData currentTable = null;
 		
         String userInput = "";
         String currentAttribut = "";
-        
         String answerForTables = "y";
         String answerForAttribut = "y";
         
@@ -50,7 +50,10 @@ public class Main {
 //            	logger.logError("createConnection()", "Error on connexion to database.");
 //            }
  
-        	parser.parse("./labo-test/DBQ7.sql");
+        	// Parser automatiquement
+        	listOfTables = parser.parse("./labo-test/DBQ10.sql");
+        	parser.printArrayTableData(listOfTables);
+        	
           
         } catch (Exception e) {
         	logger.logError("Main()", e.getMessage());			

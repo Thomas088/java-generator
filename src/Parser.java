@@ -4,12 +4,14 @@ import java.util.Scanner;
 import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
  * Parser => Class for parsing a JMerise or Looping .sql file
- * @author Utilisateur
+ * @author Java Generator Team
  *
  */
 public class Parser {
@@ -24,7 +26,7 @@ public class Parser {
 	private static final StringBuilder currentLine = new StringBuilder();
 	private static final StringBuilder currentCharacter = new StringBuilder();
 	private static final RegexRepertory regexRepertory = new RegexRepertory();
-	private static final Vector<TableData> listOfTables = new Vector<TableData>();	
+	private static final Vector<TableData> listOfTables = new Vector<TableData>();
 	private static final String createTableStr = "CREATE TABLE ";
 	private static final String openParenthese = "(";
 	private static final String closeParenthese = ")";
@@ -34,7 +36,10 @@ public class Parser {
 	private static LinkedList<String> arrayAttributeTemp;
 	private static LinkedList<String> arrayTypeTemp;
 	
+	private static HashMap<String, ArrayList<String>> mapAttributeDataTemp;
+	
 	private static boolean isNumberFounded;
+	private static boolean isEmptySpace;
 	private static Integer marker;
 	private static Integer i;
 	private static Matcher matcher;	
@@ -57,14 +62,15 @@ public class Parser {
 		currentLine.setLength(0);
 		currentCharacter.setLength(0);
 		attrType.setLength(0);
+		
 	}
 	
 	// ------------------ PARSER HELPERS ----------------------- // 
 
 	/**
 	 * isPrimaryKey = detect if the parsed line is for a primary key attribute
-	 * Strategy = we have to lower case all the line for a check (toLowerCase())  
-	 * @param {String} currentLine
+	 * Strategy = we have to lower case all the line before the check (toLowerCase())  
+	 * @param {String} currentLine : the line to evaluate : the line to evaluate
 	 * @return {boolean} the response
 	 */
 	private static boolean isPrimaryKey(String currentLine) {	
@@ -72,9 +78,66 @@ public class Parser {
 	}
 	
 	/**
+	 * isPrimaryKeyLineStart = detect if the parsed line start with primary key keyword
+	 * Strategy = we have to lower case all the line before the check (toLowerCase())  
+	 * @param {String} currentLine : the line to evaluate : the line to evaluate
+	 * @return {boolean} the response
+	 */
+	private static boolean isPrimaryKeyLineStart(String currentLine) {	
+		return currentLine.trim().toLowerCase().startsWith("primary key");
+	}
+	
+	/**
+	 * isforeignKeyLineStart = detect if the parsed line start with foreign key keyword
+	 * Strategy = we have to lower case all the line before the check (toLowerCase())  
+	 * @param {String} currentLine : the line to evaluate : the line to evaluate
+	 * @return {boolean} the response
+	 */
+	private static boolean isforeignKeyLineStart(String currentLine) {	
+		return currentLine.trim().toLowerCase().startsWith("foreign key");
+	}
+	
+	/**
+	 * isComposedPrimaryKey = detect if the parsed line is for a primary key composed attribute (more than 1 primary key)
+	 * @param {String} currentLine : the line to evaluate : the line to evaluate
+	 * @return {boolean} the response
+	 */
+	private static boolean isComposedPrimaryKey(String currentLine) {
+		
+		if (!isPrimaryKeyLineStart(currentLine)) {
+			return false;
+		}
+
+		currentCharacter.setLength(0);
+		
+		for (int i = 0; i < currentLine.length(); i++) {
+			
+			currentCharacter.append(Character.toString(currentLine.charAt(i)));
+			isEmptySpace = isEmptySpace(currentCharacter.toString());
+			
+			if (!isEmptySpace) {
+				
+				if (currentCharacter.toString().equals(openParenthese)) {
+					marker = i; // start primary key list after the parenthese
+				}
+					
+				if (i > marker && (i != (currentLine.length() - 1))) { // we are in primary key list
+					
+					if (currentCharacter.toString().equals(virgule)) {
+						return true; // We don't search anymore - the next comma is another primary key or after close parentheses
+					}  	
+				}
+			}
+			currentCharacter.setLength(0); // for each character in the line
+		}
+		
+		return false;
+	}
+	
+	/**
 	 * isConstraintLine = detect if the parsed line is for a constraint (PK, FK)
-	 * Strategy = we have to lower case all the line for a check (toLowerCase())  
-	 * @param {String} currentLine
+	 * Strategy = we have to lower case all the line before the check (toLowerCase())  
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {boolean} the response
 	 */
 	private static boolean isConstraintLine(String currentLine) {
@@ -89,8 +152,8 @@ public class Parser {
 	
 	/**
 	 * isNullAttributeLine = detect if the parsed line is null
-	 * Strategy = we have to lower case all the line for a check (toLowerCase())  
-	 * @param {String} currentLine
+	 * Strategy = we have to lower case all the line before the check (toLowerCase())  
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {boolean} the response
 	 */
 	private static boolean isNullAttributeLine(String currentLine) {
@@ -103,8 +166,8 @@ public class Parser {
 	
 	/**
 	 * isNullAttributeLine = detect if the parsed line is not null
-	 * Strategy = we have to lower case all the line for a check (toLowerCase())  
-	 * @param {String} currentLine
+	 * Strategy = we have to lower case all the line before the check (toLowerCase())  
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {boolean} the response
 	 */
 	private static boolean isNotNullAttributeLine(String currentLine) {	
@@ -113,8 +176,8 @@ public class Parser {
 	
 	/**
 	 * isForeignKey = detect if the parsed line is for a foreign key
-	 * Strategy = we have to lower case all the line for a check (toLowerCase())  
-	 * @param {String} currentLine
+	 * Strategy = we have to lower case all the line before the check (toLowerCase())  
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {boolean} the response
 	 */
 	private static boolean isForeignKey(String currentLine) {
@@ -123,7 +186,7 @@ public class Parser {
 	
 	/**
 	 * isCommentLine = detect if the parsed line is for a comment
-	 * @param {String} currentLine
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {boolean} the response
 	 */
 	private static boolean isCommentLine(String currentLine) { 
@@ -132,7 +195,7 @@ public class Parser {
 	
 	/**
 	 * isLineEmpty = detect if the parsed line is empty
-	 * @param {String} currentLine
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {boolean} the response
 	 */
 	private static boolean isLineEmpty(String currentLine) { 
@@ -141,17 +204,17 @@ public class Parser {
 	
 	/**
 	 * isEndOfTable = detect if the parsed line is a end of table
-	 * @param {String} currentLine
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {boolean} the response
 	 */
 	private static boolean isEndOfTable(String currentLine) { 
-		return currentLine.trim().startsWith(")ENGINE=InnoDB;") || 
+		return currentLine.trim().toLowerCase().startsWith(")engine=innoDB;") || 
 			   currentLine.trim().contains(");");
 	}
 	
 	/**
 	 * isBoolean = detect if the parsed line is a boolean attribute (format: 'boolean' | 'bool')
-	 * @param {String} currentLine
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {boolean} the response 
 	 */
 	private static boolean isBooleanAttr(String currentLine) { 	
@@ -166,18 +229,18 @@ public class Parser {
 	
 	/**
 	 * getTablenameByIndex => get the table name(s) of generated .SQL or text file (works for Jmerise) - Search by string indexes
-	 * @param {String} currentLine
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {String} The tablename
 	 */
 	private static String getTablenameByIndex(String currentLine) {
 		
 		initStrings();
 		
-		 for (Integer i = 0; i < currentLine.length(); i++) {
+		 for (int i = 0; i < currentLine.length(); i++) {
 
 			 currentCharacter.append(Character.toString(currentLine.charAt(i)));
 			 
-			 // Si l'on tombe apres le CREATE TABLE et l'espace	 
+			    // Si l'on tombe apres le CREATE TABLE et l'espace	 
 			    if (i >= createTableStr.length()) {
 	
 			        // ... ET si l'on ne tombe pas sur la openParenthese ouvrante
@@ -196,42 +259,50 @@ public class Parser {
 	
 	/**
 	 * getTablenameByRegex => get the table name(s) of generated .SQL or text file - Search by regular expression (regex)
-	 * @param {String} currentLine
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {String} The tablename
 	 */
 	private static String getTablenameByRegex(String currentLine) {
 		
 		initStrings();
 		
-		Pattern createTablePattern = Pattern.compile(createTableStr, Pattern.CASE_INSENSITIVE);
-        Matcher createTableMatcher = createTablePattern.matcher(currentLine);
+		matcher = regexRepertory.getCreateTablePattern().matcher(currentLine);
          
-        if (createTableMatcher.find()) {
+        if (matcher.find()) {
         	tableResult.append(currentLine.replaceAll(createTableStr, "").replace(openParenthese, "").trim()) ;
         } else {
         	logger.logWarning("getTablenameByRegex()", "No match.");
         }
 		
         return tableResult.toString();
-	}	
+	}
+	
+	/**
+	 * isEmptySpace() => Detect that current character is space (or tab).
+	 * @param strCharacter
+	 * @return {boolean} the response
+	 */
+	private static boolean isEmptySpace(String strCharacter) {
+		return strCharacter.toString().equals(" ") || 
+			   strCharacter.toString().equals("\t"); // tabulation 
+	}
 	
 	// ------------------ ATTRIBUTES ----------------------- //
 	
 	/**
 	 * getAttributeName = parse the line for get the current attribute of a table
-	 * @param {String} currentLine
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {String} the attribute parsed
 	 */
 	private static String getAttributeName(String currentLine) {
 	
 		initStrings();
-		
-		for (Integer i = 0; i < currentLine.length(); i++) {
+
+		for (int i = 0; i < currentLine.length(); i++) {
 			
 			currentCharacter.append(currentLine.charAt(i));
 			
-			boolean isEmptySpace = Character.compare(currentCharacter.toString().charAt(0), ' ') == 0 || 
-					    		   Character.compare(currentCharacter.toString().charAt(0), '\t') == 0;
+			isEmptySpace = isEmptySpace(currentCharacter.toString());
 			
 			if (!isEmptySpace) {
 				
@@ -250,7 +321,7 @@ public class Parser {
 	
 	/**
 	 * getTypeOfAttribute = detect in the parsed line the specified attribute key (comparision with the mariaTypesList enum values)
-	 * @param {String} currentLine
+	 * @param {String} currentLine : the line to evaluate
 	 * @return {String} the attribute type
 	 */
 	private static String getTypeOfAttribute(String currentLine) {
@@ -300,7 +371,7 @@ public class Parser {
 		
 			if (currentAttr.toString().equals(varchar)) {
 		
-				for (Integer i = 0; i < currentLine.length(); i++) {
+				for (int i = 0; i < currentLine.length(); i++) {
 					
 					if (Character.toString(currentLine.charAt(i)).equals(openParenthese)) {
 						marker = i; // Set the new marker here
@@ -379,7 +450,6 @@ public class Parser {
     	}
     	
     	return getTablenameByIndex(currentLine.toString());
-		
 	}
 	
 	public static void printArrayTableData(Vector<TableData> array) {
@@ -396,17 +466,16 @@ public class Parser {
 	    	  
         	out.println("------------------------------------");
         	out.println("tableName : " + currentTable.getTableName());
-        	out.println("isPivot : " + currentTable.isPivot());
+        	out.println("isPivot : " + currentTable.isIntermediaryTable());
         	out.println("attributeList : " + currentTable.getAttributeList());
         	out.println("typesList : " + currentTable.getTypesList());
         	out.println("foreignKeyList : " + currentTable.getForeignKeyList());
 	    }
 	}
 	
-	
 	// --------------------- PARSE --------------------- //
 	
-	public void parse(String path) {
+	public static Vector<TableData> parse(String path) {
 		
 	  try {
 			
@@ -418,13 +487,13 @@ public class Parser {
 	        	
 	        	logger.logError("parse()", "The file not exists.");
 	        	scanner.close();
-	        	return;
+	        	return listOfTables;
 	        	
 	        } else if (!jMeriseSQL.canRead()) {
 	        	
 	        	logger.logError("parse()", "The file is unreadable.");
 	        	scanner.close();
-	        	return;
+	        	return listOfTables;
 	        } 
 	         
 	        i = 1; // we start like the .sql file
@@ -446,20 +515,29 @@ public class Parser {
 	        	if (!isCommentLine(temp) && !isLineEmpty(temp)) {
 	        		
 	            	if (temp.startsWith(createTableStr)) {          		
-	            		tableName = getTablenameByIndex(temp);
+	            		tableName = getTablenameByRegex(temp);
 	            		marker = i;
 	            		
 			  	    	// init arrays for the next table
 			  	    	arrayAttributeTemp = new LinkedList<String>();
 			  	    	arrayTypeTemp = new LinkedList<String>();
+			  	    	
+//			  	    	mapAttributeDataTemp = new HashMap<String, ArrayList<String>>();
 		        	} 
 	            	
 	            	if (i > marker) { // we are in attribute list (because attribute is marker + 1)
 	            		
-		            	if(!isConstraintLine(temp)) {  // [DEBUG] - for the moment because the pivot tables is not yet handled
-	
+		            	if(isConstraintLine(temp)) {
+		            		
+		            		// DEBUG
+	            			if (isComposedPrimaryKey(temp)) {
+	            				out.println("PIVOT ! - current line : " + temp);
+	            			}
+		            		
+			            } else {
+			            	
 		            		if(!isEndOfTable(temp)) { 
-        		
+		                		
 			            		attribute = getAttributeName(temp);
 			            		type = getTypeOfAttribute(temp);
 			   
@@ -470,27 +548,29 @@ public class Parser {
 			            		
 		            			// Prepare new tableData and push to list
 			            		newTable = new TableData();
+			            		
 			            		newTable.setTableName(tableName);    	
 			            		newTable.setAttributeList(arrayAttributeTemp);
 			            		newTable.setTypesList(arrayTypeTemp);
 			            		
 			            		listOfTables.add(newTable);
-			        
 			            		marker = 0; // Reset for the next new table	
-			            	} 		
-			            }	 
+			            	} 
+			            }
 	            	}	
 	        	}
 	        	
 	          i++;
 	        }
-	      
-			printArrayTableData(listOfTables);
+	
 			out.println("ARRAY LENGTH : " + listOfTables.size());
 			scanner.close();
+			return listOfTables;
 			
 		} catch (Exception e) {
-			logger.logError("parseTEST()", e.getMessage());
+			logger.logError("parse()", e.getMessage());
 		}
-	}    
+	  
+	  return listOfTables;
+	}
  }  

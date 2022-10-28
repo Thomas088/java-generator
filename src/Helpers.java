@@ -317,10 +317,5 @@ public class Helpers {
 	    	throw ex;
 	    }
 	}
-	
-	public int generateRandom(int max, int min) {
-		int random = (int)Math.floor( Math.random() * (max - min + 1) + min);
-		return random;
-	}
-	
+
 }

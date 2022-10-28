@@ -15,6 +15,10 @@ public class RegexRepertory {
 	private static final Pattern emailStrictRegex = Pattern.compile("^(?=.{1,64}@)[A-Za-z0-9_-]+(\\\\.[A-Za-z0-9_-]+)*@[^-][A-Za-z0-9-]+(\\\\.[A-Za-z0-9-]+)*(\\\\.[A-Za-z]{2,})$");
 	private static final Pattern phoneRegex = Pattern.compile("^[+]*[(]{0,1}[0-9]{1,4}[)]{0,1}[-\\s\\./0-9]*$");
 	private static final Pattern singleDotForDecimals = Pattern.compile("[.]{1}");
+	private static final Pattern createTablePattern = Pattern.compile("CREATE TABLE ", Pattern.CASE_INSENSITIVE);
+	
+	
+	// ------------------- GETTERS / SETTERS --------------------- //
 	
 	/**
 	 * getLettersPattern() = get the (only) letters pattern
@@ -44,7 +48,7 @@ public class RegexRepertory {
 	 * getSpecialCharactersWithoutDotPattern() = get the (only) special characters pattern (without the dot)
 	 * @return {Pattern} the regex pattern
 	 */
-	public static Pattern getSpecialCharactersWithoutDotPattern() {
+	public Pattern getSpecialCharactersWithoutDotPattern() {
 		return specialCharactersWithoutDotPattern;
 	}
 
@@ -76,7 +80,15 @@ public class RegexRepertory {
 	 * getSingleDotForDecimals() = Pattern for check the one dot delimiter (for float and doubles values)
 	 * @return {Pattern} the regex pattern
 	 */
-	public static Pattern getSingleDotForDecimals() {
+	public Pattern getSingleDotForDecimals() {
 		return singleDotForDecimals;
+	}
+
+	/**
+	 * getCreateTablePattern() = Pattern for check the CREATE TABLE Statement
+	 * @return {Pattern} the regex pattern
+	 */
+	public Pattern getCreateTablePattern() {
+		return createTablePattern;
 	}
 }

@@ -51,6 +51,8 @@ public class Main {
         	// Parser automatiquement
         	listOfTables = parser.parse("./labo-test/mcfly.sql");
         	parser.printArrayTableData(listOfTables);
+            
+            parser.createFile("eci-insert-test");
            
 //  			while(answerForAttribut.toString().equalsIgnoreCase("y")) {
 //  				out.println("Enter table name : ");

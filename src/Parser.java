@@ -1,5 +1,6 @@
 import static java.lang.System.*;
 import java.io.File;
+import java.io.IOException;
 import java.util.Scanner;
 import java.util.Vector;
 import java.util.ArrayList;
@@ -41,14 +42,15 @@ public class Parser {
 	private static HashMap<String, ArrayList<String>> mapAttributeDatasTemp;
 	
 	// VARIABLES USED IN ALL METHODS 
-	private static File sqlFile;
+	private static File sqlFileToCreate;
+	private static File sqlFileToRead;
 	private static boolean isIntermediaryTable;
 	private static boolean isNullAttribute;
 	private static int marker;
 	private static int attributeLength;
 	private static int markerForTables;
 	private static int i;
-	private static Integer nbTables;
+	private static int nbTables;
 	private static Matcher matcher;	
 	private static String temp;
 	private static String tableName;
@@ -517,10 +519,10 @@ public class Parser {
 		
 	  try {
 			
-	        sqlFile = new File(path);   
-	        Scanner scanner = new Scanner(sqlFile);
+		    sqlFileToRead = new File(path);   
+	        Scanner scanner = new Scanner(sqlFileToRead);
 	        
-	        if (!Helpers.isDocumentValidForRead(sqlFile)) {
+	        if (!Helpers.isDocumentValidForRead(sqlFileToRead)) {
 	        	scanner.close();
 	        	return listOfTables;
 	        }
@@ -530,7 +532,7 @@ public class Parser {
 	    	TableData newTable = null;
 	    	
 	    	// init
-//	        initStrings();
+	        initStrings();
 	        listOfTables.clear();
 	      
 	        while(scanner.hasNextLine()) {
@@ -631,27 +633,40 @@ public class Parser {
 	  return null;
 	}
 	
-	public File writeToFile(int quantityOfLines, Vector<TableData> tables, String path) {
+	public File createFile(String filename) {
 		
-		try {
+		  sqlFileToCreate = new File("./" + filename + ".sql");
+		
+	      try {
+	    	  
+				if (sqlFileToCreate.createNewFile()) {
+					
+				    System.out.println("File created : " + sqlFileToCreate.getName());
+				    return null;
+				    
+				  } else {  
+				    System.out.println("File : " + sqlFileToCreate.getName() + " already exists.");
+				    return null;
+				  }
 			
-			sqlFile = new File(path);
-			
-	        if (!Helpers.isDocumentValidForWrite(sqlFile)) {
-	        	logger.logError("writeToFile()", "Fail on file.");
-	        	return sqlFile;
-	        }
-			
-			
-			// DO LOGIC
-			logger.logInfo("writeToFile()", "Fail");
-			return sqlFile;
-			
-		} catch (Exception e) {
+		} catch (IOException e) {
 			logger.logError("writeToFile()", e.getMessage());
 		}
+	      
+		return sqlFileToCreate;
+	}
+	
+	public File writeToFile(int quantityOfLines, Vector<TableData> tables, String path) throws IOException {
 		
-		logger.logError("writeToFile()", "Fail");
-		return null;	
+		sqlFileToRead = new File(path);
+		
+		if (!Helpers.isDocumentValidForWrite(sqlFileToRead)) {
+			logger.logError("writeToFile()", "Fail on file.");
+			return sqlFileToRead;
+		}
+		
+		logger.logInfo("writeToFile()", "Fail");
+		return null;
+		
 	}
  }  

@@ -61,7 +61,6 @@ public class TableData {
 		// attributeDatas["age"] = ["number", "number", "0", not-null]
 		// attributeDatas["isDeleted"] = ["boolean", "boolean", "0", not-null]
 		
-		// Seule difficulte a prevoir : la modification de la map
 	}
 	
 	// ------------------- GETTERS / SETTERS --------------------- //

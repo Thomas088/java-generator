@@ -24,7 +24,6 @@ public class Main {
 		// IMPORT DES AUTRES CLASSES NECESSAIRE AU MENU
 		MenuDisplays menus = new MenuDisplays();
 	    Parser parser = new Parser();
-	    Helpers helper = new Helpers();
 		DatabaseController database = new DatabaseController();
 		GeneratorLogger logger = new GeneratorLogger();
 		Vector<TableData> listOfTables = new Vector<TableData>();
@@ -43,16 +42,14 @@ public class Main {
             isLogged = database.createConnection();
             
             if (isLogged) {
-            	
             	logger.logInfo("createConnection()", "Connexion success.");
 //            	database.callSearchDatasProcedure("address", 50); // <= Decommenter pour tester     	
-            	
             } else {
             	logger.logError("createConnection()", "Error on connexion to database.");
             }
  
         	// Parser automatiquement
-        	listOfTables = parser.parse("./labo-test/first-test.sql");
+        	listOfTables = parser.parse("./labo-test/mcfly.sql");
         	parser.printArrayTableData(listOfTables);
            
 //  			while(answerForAttribut.toString().equalsIgnoreCase("y")) {

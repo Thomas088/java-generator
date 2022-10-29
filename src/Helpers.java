@@ -1,5 +1,6 @@
 import static java.lang.System.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
@@ -266,6 +267,8 @@ public class Helpers {
 		return inputCurrentValue.toString();
 	}
 	
+	// --------- Helpers for Files (read, write etc) ----------- // 
+	
 	/**
 	 * readStringWithoutSpecialCharacters() = Method for ask to user for enter a string value (without special characters)
 	 * @return {String} the result
@@ -293,6 +296,49 @@ public class Helpers {
 		
 		logger.logInfo("readStringWithoutSpecialCharacters()", "Value OK - You defined : " + inputCurrentValue.toString());
 		return inputCurrentValue.toString();
+	}
+	
+	/**
+	 * isDocumentValidForRead() : check if the .sql file is valid and available (or not)
+	 * @param {File} currentFile
+	 * @return {boolean} the response
+	 */
+	public static boolean isDocumentValidForRead(File currentFile) {
+		
+        if(!currentFile.exists()) {   	
+        	logger.logError("isDocumentValidForRead()", "The file " + currentFile.getName() + " not exists.");
+        	return false;
+        	
+        } else if (!currentFile.canRead()) {
+        
+        	logger.logError("isDocumentValidForRead()", "The file " + currentFile.getName() + " is unreadable.");
+        	return false;
+        }
+        
+        logger.logInfo("isDocumentValidForRead()", "File " + currentFile.getName() + " opened with success.");
+        return true;
+	}
+	
+	
+	/**
+	 * isDocumentValidForWrite() : check if the .sql file is valid and available (or not)
+	 * @param {File} currentFile
+	 * @return {boolean} the response
+	 */
+	public static boolean isDocumentValidForWrite(File currentFile) {
+		
+        if(!currentFile.exists()) {   	
+        	logger.logError("isDocumentValidForWrite()", "The file " + currentFile.getName() + " not exists.");
+        	return false;
+        	
+        } else if (!currentFile.canWrite()) {
+        
+        	logger.logError("isDocumentValidForWrite()", "The file " + currentFile.getName() + " is unreadable.");
+        	return false;
+        }
+        
+        logger.logInfo("isDocumentValidForWrite()", "File " + currentFile.getName() + " opened with success.");
+        return true;
 	}
 	
 

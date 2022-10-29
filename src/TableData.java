@@ -11,45 +11,64 @@ public class TableData {
 	
 	// TO REPLACE
 	private ArrayList<String> attributeList;
+	private ArrayList<String> databaseEquivalenceList;
 	private ArrayList<String> typesList;
 	private ArrayList<String> foreignKeyList;
+	private ArrayList<String> isNullList;
 	
 	private String tableName = "";
 	
-	// NEW DATA ARCHITECTURE (SOON)
+	// NEW DATA ARCHITECTURE 
 	private Map<String, ArrayList<String>> attributeDatas; 
-	
+
 	private boolean isIntermediaryTable;
 
 	public TableData() {
 		
 		this.tableName = "";
+		
+		// ARRAYS VERSION
 		this.isIntermediaryTable = false;
 		this.attributeList = new ArrayList<String>();
+		this.databaseEquivalenceList = new ArrayList<String>();
 		this.typesList = new ArrayList<String>();
 		this.foreignKeyList = new ArrayList<String>();
-
-		// STRUCTURE IN MAP (HashMap) - pair KEY / VALUE => SOON - NOT USED (WE USE OLD IMPLEMENTATION FOR THE MOMENT)
-		// Explanations : 
-		// KEY = the attribute
-		// VALUE = An array with all attribute datas.
-		// Array attribute datas order (type, length(if varchar else 0), null / not null)
-		// if attribute is foreign key (foreign_key name, table referencement)
+		this.isNullList = new ArrayList<String>();
 		
-		// ----------------------------------------------------------------- //
-		
-		// Examples : 
-		// MAP => "idClient" => ["int", "auto increment"]
-		// MAP => "lastname" => ["varchar", "255", "not null"]
-		// MAP => "lastname" => ["varchar", "255", "not null"]
+		// HASHMAP VERSION
 		this.attributeDatas = new HashMap<String, ArrayList<String>>();
+		
+		// attributeDatas ???
+		
+		// Explication de la nouvelle architecture 
+		// Une map qui contiendrait toute les informations par attributs
+		
+		// Pour la partie de gauche La cle sera le nom de l'attribut. ex attributeDatas["Prenom"] - attributeDatas["telephone_mobile"]...
+		// Pour le reste, il faut juste bien gerer l'ordre...
+		
+		// Ordre :
+		
+		// 1) l'equivalent en DB (firstname, lastname etc) - pour les types primitifs, on utilisera l'enum en place (MariaTypes)
+		// 2) le type (evidemment - int, varchar etc)
+		// 3) la longueur (si varchar... sinon 0)
+		// 4) NULL / NOT NULL (evidemment)
+		
+		// Exemple :
+		
+		// attributeDatas["id_drone"] = ["auto_increment", "varchar", "0", null]
+		// attributeDatas["Prenom"] = ["firstname", "varchar", "255", not-null]
+		// attributeDatas["nom_de_famille"] = ["lastname", "varchar", "255", not-null]
+		// attributeDatas["age"] = ["number", "number", "0", not-null]
+		// attributeDatas["isDeleted"] = ["boolean", "boolean", "0", not-null]
+		
+		// Seule difficulte a prevoir : la modification de la map
 	}
 	
 	// ------------------- GETTERS / SETTERS --------------------- //
 	
 	/**
 	 * getTableName() : get name of current table
-	 * @return the tableName
+	 * @return {String} the tableName
 	 */
 	public String getTableName() {
 		return tableName;
@@ -57,7 +76,7 @@ public class TableData {
 
 	/**
 	 * setTableName() : set name of current table
-	 * @param tableName the tableName to set
+	 * @param {String} tableName the tableName to set
 	 */
 	public void setTableName(String tableName) {
 		this.tableName = tableName;
@@ -65,7 +84,7 @@ public class TableData {
 
 	/**
 	 * getAttributeList() : get the attribute list of the current table
-	 * @return the attributeList
+	 * @return {ArrayList<String>} the attributeList
 	 */
 	public ArrayList<String> getAttributeList() {
 		return attributeList;
@@ -73,15 +92,15 @@ public class TableData {
 	
 	/**
 	 * pushInAttributeList() : insert new attribute into the attribute list of the current table
-	 * @param attributeList the attributeList to set
+	 * @param {String} attributeList the attributeList to set
 	 */
 	public void pushInAttributeList(String attribute) {
 		this.attributeList.add(attribute);
 	}
 
 	/**
-	 * setAttributeList() : set the new list of attribute into the current attributeList
-	 * @param attributeList the attributeList to set
+	 * setAttributeList() : set the new list of attribute into the current attributeList of the current table
+	 * @param {ArrayList<String>} attributeList the attributeList to set
 	 */
 	public void setAttributeList(ArrayList<String> attributeList) {
 		this.attributeList = attributeList;
@@ -89,7 +108,7 @@ public class TableData {
 
 	/**
 	 * getTypesList() : return the array of types (int, varchar etc)
-	 * @return the typesList
+	 * @return {ArrayList<String>} the typesList
 	 */
 	public ArrayList<String> getTypesList() {
 		return typesList;
@@ -97,7 +116,7 @@ public class TableData {
 	
 	/**
 	 * pushInTypesList() : insert new type into the typeList of the current table
-	 * @param typesList the typesList to set
+	 * @param {String} typesList the typesList to set
 	 */
 	public void pushInTypesList(String type) {
 		this.typesList.add(type);
@@ -105,7 +124,7 @@ public class TableData {
 
 	/**
 	 * setTypesList() : set the new list of types into the current typesList
-	 * @param typesList the typesList to set
+	 * @param {ArrayList<String>} typesList the typesList to set
 	 */
 	public void setTypesList(ArrayList<String> typesList) {
 		this.typesList = typesList;
@@ -113,13 +132,14 @@ public class TableData {
 
 	/**
 	 * isIntermediaryTable() : return if the table is intermediary (pivot) or not
-	 * @return the isIntermediaryTable
+	 * @return {boolean} the isIntermediaryTable
 	 */
 	public boolean isIntermediaryTable() {
 		return isIntermediaryTable;
 	}
 
 	/**
+	 * setIntermediaryTable() : set the table intermediary state of the current table
 	 * @param isIntermediaryTable : the isIntermediaryTable variable to set
 	 */
 	public void setIntermediaryTable(boolean isIntermediaryTable) {
@@ -135,7 +155,7 @@ public class TableData {
 	}
 
 	/**
-	 * pushInForeignKeyList() : insert new foreign key into the foreignKeyList of the current table
+	 * pushInForeignKeyList() : insert new foreign key into the foreignKeyList of the current tableData
 	 * @param foreignKey : the attributeList to set
 	 */
 	public void pushInForeignKeyList(String foreignKey) {
@@ -143,35 +163,51 @@ public class TableData {
 	}
 
 	/**
-	 * setForeignKeyList() : set the new list of foreign keys into the current foreignKeyList
+	 * setForeignKeyList() : set the new list of foreign keys into the current foreignKeyList of the current tableData
 	 * @param newForeignKeyList
 	 */
 	public void setForeignKeyList(ArrayList<String> newForeignKeyList) {
 		this.foreignKeyList = newForeignKeyList;
 	}
-
+	
 	/**
-	 * getAttributeDatas() : SOON - NOT USED
-	 * @return {Map<String, ArrayList<String>>}
+	 * getAttributeDatas() : print all datas for the current TableData
+	 * @return
 	 */
 	public Map<String, ArrayList<String>> getAttributeDatas() {
 		return attributeDatas;
 	}
 
 	/**
-	 * setAttributeDatas() : SOON - NOT USED
-	 * @param attributeDatas
+	 * setAttributeDatas() : 
+	 * @param attributeAndLength
 	 */
-	public void setAttributeDatas(HashMap<String, ArrayList<String>> attributeDatas) {
-		this.attributeDatas = attributeDatas;
+	public void setAttributeDatas(Map<String, ArrayList<String>> attributeAndLength) {
+		this.attributeDatas = attributeAndLength;
 	}
 	
 	/**
-	 * pushInAttributeDatas() : insert new values into the attribute map
+	 * pushInAttributeDatas() : push for each attributes the datas in the current TableData
+	 * @param attributeKey
 	 * @param attributeDatas
 	 */
-	public void pushInAttributeDatas(String attribute, HashMap<String, ArrayList<String>> attributeDatas) {
-		attributeDatas.put(attribute, attributeList);
+	public void pushInAttributeDatas(String attributeKey, ArrayList<String> attributeDatas) {
+		this.attributeDatas.put(attributeKey, attributeDatas);
 	}
 	
+	/**
+	 * getDatabaseEquivalenceList() : return the equivalence list for all the attribute
+	 * @return
+	 */
+	public ArrayList<String> getDatabaseEquivalenceList() {
+		return databaseEquivalenceList;
+	}
+
+	/**
+	 * 
+	 * @param databaseEquivalenceList
+	 */
+	public void setDatabaseEquivalenceList(ArrayList<String> databaseEquivalenceList) {
+		this.databaseEquivalenceList = databaseEquivalenceList;
+	}
 }

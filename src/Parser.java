@@ -5,6 +5,7 @@ import java.util.Vector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.regex.Matcher;
 
 /**
@@ -29,19 +30,24 @@ public class Parser {
 	private static final String openParenthese = "(";
 	private static final String closeParenthese = ")";
 	private static final String virgule = ",";
+	private static final String varchar = EnumList.MariaAttributeTypesListEnum.VARCHAR.getType().toLowerCase();
 	
 	// Not final because we want new arrays in parsing loop
 	private static ArrayList<String> arrayAttributeTemp;
 	private static ArrayList<String> arrayTypeTemp;
 	private static ArrayList<String> arrayForeignKeysTemp;
 	
-	private static HashMap<String, ArrayList<String>> mapLinkAttributeAndDataTemp;
+	// TODO : TO INTEGRATE (IN PROGRESS)
+	private static HashMap<String, ArrayList<String>> mapAttributeDatasTemp;
 	
-	private static boolean isNumberFounded;
+	// VARIABLES USED IN ALL METHODS 
+	private static File sqlFile;
 	private static boolean isIntermediaryTable;
-	private static Integer marker;
-	private static Integer markerForTables;
-	private static Integer i;
+	private static boolean isNullAttribute;
+	private static int marker;
+	private static int attributeLength;
+	private static int markerForTables;
+	private static int i;
 	private static Integer nbTables;
 	private static Matcher matcher;	
 	private static String temp;
@@ -63,7 +69,6 @@ public class Parser {
 		currentLine.setLength(0);
 		currentCharacter.setLength(0);
 		attrType.setLength(0);
-		
 	}
 	
 	// ------------------ PARSER HELPERS ----------------------- // 
@@ -228,6 +233,14 @@ public class Parser {
 			   strCharacter.toString().equals("\t"); // tabulation 
 	}
 	
+	// HELPER FOR DEBUG MAP VALUES
+	private void logMap(Map<String, ArrayList<String>> currentMap) {
+		// 
+		for (Map.Entry<String, ArrayList<String>> attribute : currentMap.entrySet())  {
+			System.out.println("Key = " + attribute.getKey() +  ", Value = " + attribute.getValue());
+		} 
+	}
+	
 
 	// ------------------ GENERAL METHODS ----------------------- // 
 	
@@ -340,9 +353,9 @@ public class Parser {
 	/**
 	 * getLengthOfVarcharByIndex() => Get the length of the current attribute (INDEX VERSION)
 	 * @param currentLine
-	 * @return {Integer} the length
+	 * @return {int} the length
 	 */
-	private static Integer getLengthOfVarcharByIndex(String currentLine) {
+	private static int getLengthOfVarcharByIndex(String currentLine) {
 		
 		initStrings();
 		marker = 9999; // Set the market on the first time like this (for later)
@@ -350,8 +363,6 @@ public class Parser {
 		String strTemp = getTypeOfAttribute(currentLine.toLowerCase().trim());
 		currentAttr.setLength(0);
 		currentAttr.append(strTemp);
-		
-		String varchar = EnumList.MariaAttributeTypesListEnum.VARCHAR.toString();
 		
 			if (currentAttr.toString().equals(varchar)) {
 		
@@ -372,21 +383,20 @@ public class Parser {
 			
 			}
 			
-		return Integer.parseInt(numberResult.toString().trim());
+		String result = numberResult.toString().trim().length() > 0 ? numberResult.toString() : "0";	
+		return Integer.parseInt(result);
 	}
 	
 	/**
 	 * getLengthOfVarcharByRegex() => Get the length of the current attribute (REGEX VERSION)
 	 * @param currentLine
-	 * @return {Integer} the length
+	 * @return {int} the length
 	 */
-	private static Integer getLengthOfVarcharByRegex(String currentLine) {
+	private static int getLengthOfVarcharByRegex(String currentLine) {
 	
 		String strTemp = getTypeOfAttribute(currentLine.toLowerCase().trim());
 		currentAttr.setLength(0);
 		currentAttr.append(strTemp);
-		
-		String varchar = EnumList.MariaAttributeTypesListEnum.VARCHAR.getType();
 		
 			if (currentAttr.toString().equals(varchar)) {
 				
@@ -397,7 +407,8 @@ public class Parser {
 				}		
 			}
 			
-		return Integer.parseInt(numberResult.toString().trim());
+	    String result = numberResult.toString().trim().length() > 0 ? numberResult.toString() : "0";	
+		return Integer.parseInt(result);
 	}
 	
 	/**
@@ -421,6 +432,11 @@ public class Parser {
 		}
 	}
 	
+	/**
+	 * getTableName() : Print and return the table detected in the current line
+	 * @param {String} currentLine
+	 * @return
+	 */
 	public static String getTableName(String currentLine) {
 		
     	if (currentLine.toString().startsWith(createTableStr)) {
@@ -495,53 +511,32 @@ public class Parser {
 	    }
 	}
 	
-	/**
-	 * isDocumentValid() : check if the .sql file is valid and available (or not)
-	 * @param {File} currentFile
-	 * @return {boolean} the response
-	 */
-	public static boolean isDocumentValid(File currentFile) {
-		
-        // [file] check if all is well configured
-        if(!currentFile.exists()) {   	
-        	logger.logError("isDocumentValid()", "The file not exists.");
-        	return false;
-        	
-        } else if (!currentFile.canRead()) {
-        	
-        	logger.logError("isDocumentValid()", "The file is unreadable.");
-        	return false;
-        }
-        
-        logger.logInfo("isDocumentValid()", "File opened with success.");
-        return true;
-	}
-	
 	// --------------------- PARSE --------------------- //
 	
 	public Vector<TableData> parse(String path) {
 		
 	  try {
 			
-	        File sqlFile = new File(path);   
+	        sqlFile = new File(path);   
 	        Scanner scanner = new Scanner(sqlFile);
 	        
-	        if (!isDocumentValid(sqlFile)) {
+	        if (!Helpers.isDocumentValidForRead(sqlFile)) {
 	        	scanner.close();
 	        	return listOfTables;
 	        }
 	        	         
-	        i = 1; // we start like an classic document opned in editor
+	        i = 1; // we start like an classic document opened in editor
 	        marker = 9999;
 	    	TableData newTable = null;
 	    	
 	    	// init
-	        initStrings();
+//	        initStrings();
 	        listOfTables.clear();
 	      
 	        while(scanner.hasNextLine()) {
 	        	
 	        	// reset for the next line
+	        	initStrings();
 	        	currentLine.setLength(0);
 	        	currentLine.append(scanner.nextLine());
 	        	
@@ -549,49 +544,71 @@ public class Parser {
 	        	     	
 	        	if (!isCommentLine(temp) && !isLineEmpty(temp)) {
 	        		
-	            	if (temp.startsWith(createTableStr)) {          		
+	            	if (temp.startsWith(createTableStr)) {     
+	            		
 	            		tableName = getTablenameByIndex(temp);
 	            		markerForTables = i;
 	            		
 			  	    	// init arrays for the next table
 			  	    	arrayAttributeTemp = new ArrayList<String>();
 			  	    	arrayTypeTemp = new ArrayList<String>();
+			  	    	mapAttributeDatasTemp = new HashMap<String, ArrayList<String>>();
 		        	} 
 	            	
-	            	if (i > markerForTables) { // we are in attribute list (because attribute is marker + 1)
+	            	if (i > markerForTables) { // we are in attribute list (because attribute start at marker + 1)
 			        	
 		            	if(isConstraintLine(temp)) {
 		            		
 	            			if (isComposedPrimaryKey(temp)) {
 	            				
+	            				// ARRAY VERSION
 	            				arrayForeignKeysTemp = getComposedPrimaryKeys(temp);
-	            				isIntermediaryTable = true;
+	            				isIntermediaryTable = true;         			
 	            			}
 		            		
 			            } else {
 			            	
 		            		if(!isEndOfTable(temp)) { 
 		                		
-			            		attribute = getAttributeName(temp);
-			            		type = getTypeOfAttribute(temp);
-			            		
+		            			// ARRAY VERSION
+		            			attribute = getAttributeName(temp);
+		            			attributeLength = getLengthOfVarcharByIndex(temp);
+		            			isNullAttribute = isNullAttributeLine(temp);
+		            			type = getTypeOfAttribute(temp);
 			            		arrayAttributeTemp.add(attribute);
 			            		arrayTypeTemp.add(type);
+			            		
+			            		// HASHMAP VERSION
+			            		ArrayList<String> attributeDatasArray = new ArrayList<String>();
+			            		
+			            		// no-link-to-db-yet... refresh : it's the second element of our architecture (arrays starts at 0) - we ask for the type of data in menu 
+			            		attributeDatasArray.add("no-link-to-db-yet");
+			            		attributeDatasArray.add(type);
+			            		attributeDatasArray.add(String.valueOf(attributeLength));
+			            		attributeDatasArray.add(String.valueOf(isNullAttribute));
+			            
+			            		mapAttributeDatasTemp.put(attribute.toString(), attributeDatasArray);
 			            		
 			            	} else {
 			            		
 		            			// Prepare new tableData and push to list
 			            		newTable = new TableData();
 			            		
+			            		// ARRAYS VERSION
 			            		newTable.setIntermediaryTable(isIntermediaryTable);
 			            		newTable.setTableName(tableName);    	
 			            		newTable.setAttributeList(arrayAttributeTemp);
 			            		newTable.setTypesList(arrayTypeTemp);
 			            		
-			            		if(isIntermediaryTable) {
+			            		if (isIntermediaryTable) {
 			            			newTable.setForeignKeyList(arrayForeignKeysTemp);
 			            		}
-			            		          		
+			            		
+			            		// HASHMAP VERSION
+			            		out.println("TABLE " + newTable.getTableName() + " ATTRIBUTES : \n");
+			            		logMap(mapAttributeDatasTemp);
+			            		out.println("\n");
+			            		
 			            		listOfTables.add(newTable);
 			            		markerForTables = 0; // Reset for the next new table	
 			            	} 
@@ -602,13 +619,39 @@ public class Parser {
 	          i++;
 	        }
 	       
-			scanner.close();
+			scanner.close();			
+			logger.logInfo("parse()", "Success");
 			return listOfTables;
 			
 		} catch (Exception e) {
 			logger.logError("parse()", e.getMessage());
 		}
 	  
-	  return listOfTables;
+	  logger.logError("parse()", "Fail");
+	  return null;
+	}
+	
+	public File writeToFile(int quantityOfLines, Vector<TableData> tables, String path) {
+		
+		try {
+			
+			sqlFile = new File(path);
+			
+	        if (!Helpers.isDocumentValidForWrite(sqlFile)) {
+	        	logger.logError("writeToFile()", "Fail on file.");
+	        	return sqlFile;
+	        }
+			
+			
+			// DO LOGIC
+			logger.logInfo("writeToFile()", "Fail");
+			return sqlFile;
+			
+		} catch (Exception e) {
+			logger.logError("writeToFile()", e.getMessage());
+		}
+		
+		logger.logError("writeToFile()", "Fail");
+		return null;	
 	}
  }  

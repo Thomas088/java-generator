@@ -40,20 +40,64 @@ public class Main {
         
         try {
         	   	
-//            isLogged = database.createConnection();
-//            
-//            if (isLogged) {
-//            	
-//            	database.callSearchDatasProcedure("address", 50); // <= Decommenter pour tester
-//            	
-//            } else {
-//            	logger.logError("createConnection()", "Error on connexion to database.");
-//            }
+            isLogged = database.createConnection();
+            
+            if (isLogged) {
+            	
+            	logger.logInfo("createConnection()", "Connexion success.");
+//            	database.callSearchDatasProcedure("address", 50); // <= Decommenter pour tester     	
+            	
+            } else {
+            	logger.logError("createConnection()", "Error on connexion to database.");
+            }
  
         	// Parser automatiquement
-        	listOfTables = parser.parse("./labo-test/DBQ10.sql");
+        	listOfTables = parser.parse("./labo-test/first-test.sql");
         	parser.printArrayTableData(listOfTables);
-          
+           
+//  			while(answerForAttribut.toString().equalsIgnoreCase("y")) {
+//  				out.println("Enter table name : ");
+//  				userInput = helper.readString(); // déjà un while dans le Helpers
+//  				
+//  				currentTable = new TableData(); // On instancie un nouvel objet pour chaque infos que le user rentre
+//  				currentTable.setTableName(userInput);
+//  				
+//  				// La variable est deja etablie une fois a oui pour pouvoir encoder les attributs
+//  				while(answerForAttribut.equalsIgnoreCase("y"))	
+//  					
+//  				{
+//  					answerForAttribut = "";
+//  					out.println("Enter attribute name : ");
+//  					
+//  					currentAttribut = helper.readString();
+//  					currentTable.pushInAttributeList(currentAttribut);
+//  					
+//  					answerForAttribut = helper.chooseContinueState();
+//  					
+//  					if(answerForAttribut.equalsIgnoreCase("n")) {
+//  						break;
+//  					} else {
+//  						answerForAttribut;
+//  					}
+//  					
+//  				};
+//  				
+//  				listOfTables.add(currentTable);
+//  				
+//  				if (listOfTables.size() >= 1) {
+//  					out.println("Voulez vous re-entrer une 2eme table");
+//  				}
+//  				
+//  				answerForTables = helper.chooseContinueState(); // méthode de l'état de continue ou non dans les Helpers
+//  				
+//  				if(answerForTables.equalsIgnoreCase("n")) {
+//  					break;
+//  				} else {
+//  					answerForTables = "y";
+//  				}
+//  				
+//  			 }
+        
         } catch (Exception e) {
         	logger.logError("Main()", e.getMessage());			
 		}		

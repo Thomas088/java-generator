@@ -4,7 +4,7 @@
 
 
 #------------------------------------------------------------
-# Table: drone
+#  1 )Table: drone
 #------------------------------------------------------------
 
 CREATE TABLE drone(
@@ -21,7 +21,7 @@ CREATE TABLE drone(
 
 
 #------------------------------------------------------------
-# Table: catalogfood
+# 2 ) Table: catalogfood
 #------------------------------------------------------------
 
 CREATE TABLE catalogfood(
@@ -33,7 +33,7 @@ CREATE TABLE catalogfood(
 
 
 #------------------------------------------------------------
-# Table: product
+# 3 ) Table: product
 #------------------------------------------------------------
 
 CREATE TABLE product(
@@ -55,7 +55,7 @@ CREATE TABLE product(
 
 
 #------------------------------------------------------------
-# Table: address
+#  4 ) Table: address
 #------------------------------------------------------------
 
 CREATE TABLE address(
@@ -71,7 +71,7 @@ CREATE TABLE address(
 
 
 #------------------------------------------------------------
-# Table: society
+# 5 ) Table: society
 #------------------------------------------------------------
 
 CREATE TABLE society(
@@ -92,7 +92,7 @@ CREATE TABLE society(
 
 
 #------------------------------------------------------------
-# Table: orderfood
+# 6 ) Table: orderfood
 #------------------------------------------------------------
 
 CREATE TABLE orderfood(
@@ -114,7 +114,7 @@ CREATE TABLE orderfood(
 
 
 #------------------------------------------------------------
-# Table: user
+# 7 ) Table: user
 #------------------------------------------------------------
 
 CREATE TABLE user(
@@ -138,7 +138,7 @@ CREATE TABLE user(
 
 
 #------------------------------------------------------------
-# Table: menu
+# 8 ) Table: menu
 #------------------------------------------------------------
 
 CREATE TABLE menu(
@@ -156,7 +156,7 @@ CREATE TABLE menu(
 
 
 #------------------------------------------------------------
-# Table: orderfood_product
+# 9 ) Table: orderfood_product
 #------------------------------------------------------------
 
 CREATE TABLE orderfood_product(
@@ -171,7 +171,7 @@ CREATE TABLE orderfood_product(
 
 
 #------------------------------------------------------------
-# Table: user_address
+# 10 ) Table: user_address
 #------------------------------------------------------------
 
 CREATE TABLE user_address(
@@ -186,7 +186,7 @@ CREATE TABLE user_address(
 
 
 #------------------------------------------------------------
-# Table: product_menu
+# 11) Table: product_menu
 #------------------------------------------------------------
 
 CREATE TABLE product_menu(
@@ -201,7 +201,7 @@ CREATE TABLE product_menu(
 
 
 #------------------------------------------------------------
-# Table: handle_order
+# 12) Table: handle_order
 #------------------------------------------------------------
 
 CREATE TABLE handle_order(
@@ -216,7 +216,7 @@ CREATE TABLE handle_order(
 
 
 #------------------------------------------------------------
-# Table: order_menu
+# 13) Table: order_menu
 #------------------------------------------------------------
 
 CREATE TABLE order_menu(

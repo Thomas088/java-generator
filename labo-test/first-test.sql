@@ -2,19 +2,16 @@
 #        Script MySQL.
 #------------------------------------------------------------
 
-
 #------------------------------------------------------------
-# Table: drone
+# Table: product_menu
 #------------------------------------------------------------
 
-CREATE TABLE drone(
-        idDrone   Int  Auto_increment  NOT NULL ,
-        brand     Varchar (100) NOT NULL ,
-        model     Varchar (100) NOT NULL ,
-        refDrone  Varchar (100) NOT NULL ,
-        state     Int NOT NULL ,
-        speedMax  Int NOT NULL ,
-        speedUnit Varchar (10) NOT NULL ,
-        isDeleted Bool NOT NULL
-	,CONSTRAINT drone_PK PRIMARY KEY (idDrone)
+CREATE TABLE product_menu(
+        idMenu    Int NOT NULL ,
+        idProduct Int NOT NULL ,
+        quantity  Int NOT NULL
+	,CONSTRAINT product_menu_PK PRIMARY KEY (idMenu,idProduct)
+
+	,CONSTRAINT product_menu_menu_FK FOREIGN KEY (idMenu) REFERENCES menu(idMenu)
+	,CONSTRAINT product_menu_product0_FK FOREIGN KEY (idProduct) REFERENCES product(idProduct)
 )ENGINE=InnoDB;

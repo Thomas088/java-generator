@@ -40,7 +40,9 @@ public class Parser {
 	private static boolean isNumberFounded;
 	private static boolean isIntermediaryTable;
 	private static Integer marker;
+	private static Integer markerForTables;
 	private static Integer i;
+	private static Integer nbTables;
 	private static Matcher matcher;	
 	private static String temp;
 	private static String tableName;
@@ -102,11 +104,7 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isComposedPrimaryKey(String currentLine) {
-		
-		if (!isPrimaryKeyLineStart(currentLine)) {
-			return false;
-		}
-
+	
 		currentCharacter.setLength(0);
 		
 		for (int i = 0; i < currentLine.length(); i++) {
@@ -206,8 +204,8 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static boolean isEndOfTable(String currentLine) { 
-		return currentLine.trim().toLowerCase().startsWith(")engine=innoDB;") || 
-			   currentLine.trim().contains(");");
+		return currentLine.trim().startsWith(")ENGINE=InnoDB;") || 
+			   currentLine.trim().startsWith(");");
 	}
 	
 	/**
@@ -218,6 +216,16 @@ public class Parser {
 	private static boolean isBooleanAttr(String currentLine) { 	
 		return currentLine.toLowerCase().trim().contains("BOOLEAN") || 
 			   currentLine.toLowerCase().trim().contains("BOOL");
+	}
+	
+	/**
+	 * isBlankSpace() => Detect that current character is an empty space (or tab).
+	 * @param strCharacter
+	 * @return {boolean} the response
+	 */
+	private static boolean isBlankSpace(String strCharacter) {		
+		return strCharacter.toString().equals(" ") || 
+			   strCharacter.toString().equals("\t"); // tabulation 
 	}
 	
 
@@ -261,7 +269,7 @@ public class Parser {
 	 * @return {String} The tablename
 	 */
 	private static String getTablenameByRegex(String currentLine) {
-		
+			
 		initStrings();
 		
 		matcher = regexRepertory.getCreateTablePattern().matcher(currentLine);
@@ -273,16 +281,6 @@ public class Parser {
         }
 		
         return tableResult.toString();
-	}
-	
-	/**
-	 * isBlankSpace() => Detect that current character is an empty space (or tab).
-	 * @param strCharacter
-	 * @return {boolean} the response
-	 */
-	private static boolean isBlankSpace(String strCharacter) {
-		return strCharacter.toString().equals(" ") || 
-			   strCharacter.toString().equals("\t"); // tabulation 
 	}
 	
 	// ------------------ ATTRIBUTES ----------------------- //
@@ -322,11 +320,6 @@ public class Parser {
 	 */
 	private static String getTypeOfAttribute(String currentLine) {
 		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("getLengthOfVarchar()", "Empty line.");
-			return "";
-		}
-		
 		initStrings();
 		
 		for (EnumList.MariaAttributeTypesListEnum attribute : EnumList.MariaAttributeTypesListEnum.values()) {
@@ -347,14 +340,9 @@ public class Parser {
 	/**
 	 * getLengthOfVarcharByIndex() => Get the length of the current attribute (INDEX VERSION)
 	 * @param currentLine
-	 * @return
+	 * @return {Integer} the length
 	 */
 	private static Integer getLengthOfVarcharByIndex(String currentLine) {
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("getLengthOfVarchar()", "Empty line.");
-			return 0;
-		}
 		
 		initStrings();
 		marker = 9999; // Set the market on the first time like this (for later)
@@ -390,14 +378,9 @@ public class Parser {
 	/**
 	 * getLengthOfVarcharByRegex() => Get the length of the current attribute (REGEX VERSION)
 	 * @param currentLine
-	 * @return
+	 * @return {Integer} the length
 	 */
 	private static Integer getLengthOfVarcharByRegex(String currentLine) {
-		
-		if (isLineEmpty(currentLine)) {
-			logger.logError("getLengthOfVarchar()", "Empty line.");
-			return 0;
-		}
 	
 		String strTemp = getTypeOfAttribute(currentLine.toLowerCase().trim());
 		currentAttr.setLength(0);
@@ -417,6 +400,10 @@ public class Parser {
 		return Integer.parseInt(numberResult.toString().trim());
 	}
 	
+	/**
+	 * printAttributeDatas() : Print datas of the current attribute
+	 * @param {String} currentLine 
+	 */
 	private static void printAttributeDatas(String currentLine) {
 		
     	boolean isNull = isNullAttributeLine(currentLine);
@@ -454,10 +441,6 @@ public class Parser {
 	 * @return {boolean} the response
 	 */
 	private static ArrayList<String> getComposedPrimaryKeys(String currentLine) {
-		
-		if (!isPrimaryKeyLineStart(currentLine)) {
-			return arrayAttributeTemp;
-		}
 
 		currentCharacter.setLength(0);
 		
@@ -488,47 +471,55 @@ public class Parser {
 		return arrayAttributeTemp;
 	}
 	
-	public static void printArrayTableData(Vector<TableData> array) {
-		
-		if (array.size() == 0) {
-			return;
-		}
+	/**
+	 * printArrayTableData() : Print all tables and their datas (name, attributes, types etc) - useful for display and debugging
+	 * @param {Vector<TableData>} the tables array
+	 */
+	public void printArrayTableData(Vector<TableData> array) {
 		
 		Iterator<TableData> i = array.iterator();
-	
+		nbTables = 0;
+		
 	    while (i.hasNext()) {
 	    	  
 	    	TableData currentTable = ((TableData) i.next());
+	    	nbTables++;
 	    	  
-        	out.println("------------------------------------");
+        	out.println("----- TABLE NUMBER : " + nbTables + " -----\n");
         	out.println("tableName : " + currentTable.getTableName());
         	out.println("isPivot : " + currentTable.isIntermediaryTable());
         	out.println("attributeList : " + currentTable.getAttributeList());
         	out.println("typesList : " + currentTable.getTypesList());
         	out.println("foreignKeyList : " + currentTable.getForeignKeyList());
+        	out.println("\n");
 	    }
 	}
 	
+	/**
+	 * isDocumentValid() : check if the .sql file is valid and available (or not)
+	 * @param {File} currentFile
+	 * @return {boolean} the response
+	 */
 	public static boolean isDocumentValid(File currentFile) {
 		
         // [file] check if all is well configured
-        if(!currentFile.exists()) {
-        	
-        	logger.logError("parse()", "The file not exists.");
+        if(!currentFile.exists()) {   	
+        	logger.logError("isDocumentValid()", "The file not exists.");
         	return false;
         	
         } else if (!currentFile.canRead()) {
         	
-        	logger.logError("parse()", "The file is unreadable.");
+        	logger.logError("isDocumentValid()", "The file is unreadable.");
         	return false;
         }
         
+        logger.logInfo("isDocumentValid()", "File opened with success.");
         return true;
 	}
 	
 	// --------------------- PARSE --------------------- //
 	
-	public static Vector<TableData> parse(String path) {
+	public Vector<TableData> parse(String path) {
 		
 	  try {
 			
@@ -538,8 +529,8 @@ public class Parser {
 	        if (!isDocumentValid(sqlFile)) {
 	        	scanner.close();
 	        	return listOfTables;
-	        } 
-	         
+	        }
+	        	         
 	        i = 1; // we start like an classic document opned in editor
 	        marker = 9999;
 	    	TableData newTable = null;
@@ -555,25 +546,24 @@ public class Parser {
 	        	currentLine.append(scanner.nextLine());
 	        	
 	        	temp = currentLine.toString();
-	        	
+	        	     	
 	        	if (!isCommentLine(temp) && !isLineEmpty(temp)) {
 	        		
 	            	if (temp.startsWith(createTableStr)) {          		
-	            		tableName = getTablenameByRegex(temp);
-	            		marker = i;
+	            		tableName = getTablenameByIndex(temp);
+	            		markerForTables = i;
 	            		
 			  	    	// init arrays for the next table
 			  	    	arrayAttributeTemp = new ArrayList<String>();
 			  	    	arrayTypeTemp = new ArrayList<String>();
-			  	    	
-//			  	    	mapAttributeDataTemp = new HashMap<String, ArrayList<String>>();
 		        	} 
 	            	
-	            	if (i > marker) { // we are in attribute list (because attribute is marker + 1)
-	            		
+	            	if (i > markerForTables) { // we are in attribute list (because attribute is marker + 1)
+			        	
 		            	if(isConstraintLine(temp)) {
 		            		
 	            			if (isComposedPrimaryKey(temp)) {
+	            				
 	            				arrayForeignKeysTemp = getComposedPrimaryKeys(temp);
 	            				isIntermediaryTable = true;
 	            			}
@@ -584,6 +574,7 @@ public class Parser {
 		                		
 			            		attribute = getAttributeName(temp);
 			            		type = getTypeOfAttribute(temp);
+			            		
 			            		arrayAttributeTemp.add(attribute);
 			            		arrayTypeTemp.add(type);
 			            		
@@ -602,7 +593,7 @@ public class Parser {
 			            		}
 			            		          		
 			            		listOfTables.add(newTable);
-			            		marker = 0; // Reset for the next new table	
+			            		markerForTables = 0; // Reset for the next new table	
 			            	} 
 			            }
 	            	}	
@@ -610,7 +601,7 @@ public class Parser {
 	        	
 	          i++;
 	        }
-	        
+	       
 			scanner.close();
 			return listOfTables;
 			

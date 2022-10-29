@@ -12,6 +12,7 @@ public class MenuDisplays {
 
 	private static final Helpers helper = new Helpers();
 	private static final Scanner scanner = new Scanner(new InputStreamReader(System.in));
+	private static int i;
 	
 	/**
 	 * printMainMenu()
@@ -29,9 +30,22 @@ public class MenuDisplays {
 	 */
 	 public void printMariaTypes() { 
 		 
-			int i = 1;
-			for (EnumList.mariaAttributeTypesListEnum attribute : EnumList.mariaAttributeTypesListEnum.values()) {
-				out.println(i + " - " + attribute);
+		 	i = 1;
+			for (EnumList.MariaAttributeTypesListEnum type : EnumList.MariaAttributeTypesListEnum.values()) {
+				out.println(i + " - " + type);
+				i++;
+			}
+	}
+	 
+	 
+	/**
+	 * printFakeDatabaseTypes() => our type of data in database
+	 */
+	 public void printFakeDatabaseTypes() { 
+		 
+			i = 1;
+			for (EnumList.FakeDatasFromFakeDatabaseTypesEnum type : EnumList.FakeDatasFromFakeDatabaseTypesEnum.values()) {
+				out.println(i + " - " + type);
 				i++;
 			}
 	}

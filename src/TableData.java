@@ -1,7 +1,6 @@
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * TableData => The architecture defined for retrieves data from .sql file (used in Parser class)
@@ -11,9 +10,9 @@ import java.util.ArrayList;
 public class TableData {
 	
 	// TO REPLACE
-	private LinkedList<String> attributeList;
-	private LinkedList<String> typesList;
-	private LinkedList<String> foreignKeyList;
+	private ArrayList<String> attributeList;
+	private ArrayList<String> typesList;
+	private ArrayList<String> foreignKeyList;
 	
 	private String tableName = "";
 	
@@ -26,9 +25,9 @@ public class TableData {
 		
 		this.tableName = " ";
 		this.isIntermediaryTable = false;
-		this.attributeList = new LinkedList<String>();
-		this.typesList = new LinkedList<String>();
-		this.foreignKeyList = new LinkedList<String>();
+		this.attributeList = new ArrayList<String>();
+		this.typesList = new ArrayList<String>();
+		this.foreignKeyList = new ArrayList<String>();
 		
 		// STRUCTURE IN MAP (HashMap) - pair KEY / VALUE 
 		// Explanations : 
@@ -66,7 +65,7 @@ public class TableData {
 	/**
 	 * @return the attributeList
 	 */
-	public LinkedList<String> getAttributeList() {
+	public ArrayList<String> getAttributeList() {
 		return attributeList;
 	}
 	
@@ -80,14 +79,14 @@ public class TableData {
 	/**
 	 * @param attributeList the attributeList to set
 	 */
-	public void setAttributeList(LinkedList<String> attributeList) {
+	public void setAttributeList(ArrayList<String> attributeList) {
 		this.attributeList = attributeList;
 	}
 
 	/**
 	 * @return the typesList
 	 */
-	public LinkedList<String> getTypesList() {
+	public ArrayList<String> getTypesList() {
 		return typesList;
 	}
 	
@@ -101,7 +100,7 @@ public class TableData {
 	/**
 	 * @param typesList the typesList to set
 	 */
-	public void setTypesList(LinkedList<String> typesList) {
+	public void setTypesList(ArrayList<String> typesList) {
 		this.typesList = typesList;
 	}
 
@@ -121,9 +120,9 @@ public class TableData {
 
 	/**
 	 * 
-	 * @return {LinkedList<String>}
+	 * @return {ArrayList<String>}
 	 */
-	public LinkedList<String> getForeignKeyList() {
+	public ArrayList<String> getForeignKeyList() {
 		return foreignKeyList;
 	}
 
@@ -138,8 +137,8 @@ public class TableData {
 	 * 
 	 * @param foreignKey
 	 */
-	public void setForeignKeyList(String foreignKey) {
-		this.foreignKeyList.add(foreignKey);
+	public void setForeignKeyList(ArrayList<String> newForeignKeyList) {
+		this.foreignKeyList = newForeignKeyList;
 	}
 
 	/**
@@ -157,6 +156,5 @@ public class TableData {
 	public void setAttributeDatas(HashMap<String, ArrayList<String>> attributeDatas) {
 		this.attributeDatas = attributeDatas;
 	}
-
 
 }

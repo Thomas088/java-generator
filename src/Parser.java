@@ -2,12 +2,10 @@ import static java.lang.System.*;
 import java.io.File;
 import java.util.Scanner;
 import java.util.Vector;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
+import java.util.regex.Matcher;
 
 /**
  * Parser => Class for parsing a JMerise or Looping .sql file
@@ -33,14 +31,14 @@ public class Parser {
 	private static final String virgule = ",";
 	
 	// Not final because we want new arrays in parsing loop
-	private static LinkedList<String> arrayAttributeTemp;
-	private static LinkedList<String> arrayTypeTemp;
+	private static ArrayList<String> arrayAttributeTemp;
+	private static ArrayList<String> arrayTypeTemp;
+	private static ArrayList<String> arrayForeignKeysTemp;
 	
-	private static HashMap<String, ArrayList<String>> mapAttributeDataTemp;
-//	private static ArrayList<String> array
+	private static HashMap<String, ArrayList<String>> mapLinkAttributeAndDataTemp;
 	
 	private static boolean isNumberFounded;
-	private static boolean isEmptySpace;
+	private static boolean isIntermediaryTable;
 	private static Integer marker;
 	private static Integer i;
 	private static Matcher matcher;	
@@ -114,9 +112,8 @@ public class Parser {
 		for (int i = 0; i < currentLine.length(); i++) {
 			
 			currentCharacter.append(Character.toString(currentLine.charAt(i)));
-			isEmptySpace = isEmptySpace(currentCharacter.toString());
 			
-			if (!isEmptySpace) {
+			if (!isBlankSpace(currentCharacter.toString())) {
 				
 				if (currentCharacter.toString().equals(openParenthese)) {
 					marker = i; // start primary key list after the parenthese
@@ -279,11 +276,11 @@ public class Parser {
 	}
 	
 	/**
-	 * isEmptySpace() => Detect that current character is space (or tab).
+	 * isBlankSpace() => Detect that current character is an empty space (or tab).
 	 * @param strCharacter
 	 * @return {boolean} the response
 	 */
-	private static boolean isEmptySpace(String strCharacter) {
+	private static boolean isBlankSpace(String strCharacter) {
 		return strCharacter.toString().equals(" ") || 
 			   strCharacter.toString().equals("\t"); // tabulation 
 	}
@@ -301,11 +298,9 @@ public class Parser {
 
 		for (int i = 0; i < currentLine.length(); i++) {
 			
-			currentCharacter.append(currentLine.charAt(i));
+			currentCharacter.append(currentLine.charAt(i));		
 			
-			isEmptySpace = isEmptySpace(currentCharacter.toString());
-			
-			if (!isEmptySpace) {
+			if (!isBlankSpace(currentCharacter.toString())) {
 				
 				currentAttr.append(currentLine.charAt(i));	
 					
@@ -334,7 +329,7 @@ public class Parser {
 		
 		initStrings();
 		
-		for (EnumList.mariaAttributeTypesListEnum attribute : EnumList.mariaAttributeTypesListEnum.values()) {
+		for (EnumList.MariaAttributeTypesListEnum attribute : EnumList.MariaAttributeTypesListEnum.values()) {
 			
 			currentAttr.append(attribute.toString().toLowerCase().trim());
 			
@@ -368,7 +363,7 @@ public class Parser {
 		currentAttr.setLength(0);
 		currentAttr.append(strTemp);
 		
-		String varchar = EnumList.mariaAttributeTypesListEnum.VARCHAR.getName().trim().toLowerCase();
+		String varchar = EnumList.MariaAttributeTypesListEnum.VARCHAR.toString();
 		
 			if (currentAttr.toString().equals(varchar)) {
 		
@@ -408,14 +403,13 @@ public class Parser {
 		currentAttr.setLength(0);
 		currentAttr.append(strTemp);
 		
-		String varchar = EnumList.mariaAttributeTypesListEnum.VARCHAR.getName().toLowerCase().trim();
+		String varchar = EnumList.MariaAttributeTypesListEnum.VARCHAR.getType();
 		
 			if (currentAttr.toString().equals(varchar)) {
 				
 				matcher = regexRepertory.getNumbersPattern().matcher(currentLine);
-				isNumberFounded = matcher.find();
 				
-				if (isNumberFounded) {
+				if (matcher.find()) { // number founded
 					numberResult.append(matcher.group(0));
 				}		
 			}
@@ -434,7 +428,7 @@ public class Parser {
 		out.println("Attribute type : " + getTypeOfAttribute(currentLine));
 		out.println("Attribute NULL ? : " + (isKey || !isNull));
 		
-		if (currentAttr.toString().toLowerCase().equals(EnumList.mariaAttributeTypesListEnum.VARCHAR.getName().toLowerCase())) {
+		if (currentAttr.toString().toLowerCase().equals(EnumList.MariaAttributeTypesListEnum.VARCHAR.getType().toLowerCase())) {
 			out.println("Attribute length (INDEX) : " + getLengthOfVarcharByIndex(currentLine));
 			out.println("Attribute length (REGEX) : " + getLengthOfVarcharByRegex(currentLine));
 		}
@@ -462,33 +456,36 @@ public class Parser {
 	private static ArrayList<String> getComposedPrimaryKeys(String currentLine) {
 		
 		if (!isPrimaryKeyLineStart(currentLine)) {
-			return false;
+			return arrayAttributeTemp;
 		}
 
 		currentCharacter.setLength(0);
 		
 		for (int i = 0; i < currentLine.length(); i++) {
 			
-			currentCharacter.append(Character.toString(currentLine.charAt(i)));
-			isEmptySpace = isEmptySpace(currentCharacter.toString());
-			
-			if (!isEmptySpace) {
+			if (!isBlankSpace(currentCharacter.toString())) {
 				
 				if (currentCharacter.toString().equals(openParenthese)) {
 					marker = i; // start primary key list after the parenthese
 				}
 					
-				if (i > marker && (i != (currentLine.length() - 1))) { // we are in primary key list
+				if (i > marker && (i != (currentLine.length() - 1))) { // we are in primary key list (between parenthesis)
 					
-					if (currentCharacter.toString().equals(virgule)) {
-						return true; // We don't search anymore - the next comma is another primary key or after close parentheses
-					}  	
+					if (!currentCharacter.toString().equals(virgule)) {			
+						currentAttr.append(Character.toString(currentLine.charAt(i)));
+					} else {
+						arrayAttributeTemp.add(currentAttr.toString());
+					}
+					
+					if (currentCharacter.toString().equals(closeParenthese)) {
+						 break; // We don't search anymore - we have all keys
+					}  		
 				}
 			}
 			currentCharacter.setLength(0); // for each character in the line
 		}
 		
-		return false;
+		return arrayAttributeTemp;
 	}
 	
 	public static void printArrayTableData(Vector<TableData> array) {
@@ -512,30 +509,38 @@ public class Parser {
 	    }
 	}
 	
+	public static boolean isDocumentValid(File currentFile) {
+		
+        // [file] check if all is well configured
+        if(!currentFile.exists()) {
+        	
+        	logger.logError("parse()", "The file not exists.");
+        	return false;
+        	
+        } else if (!currentFile.canRead()) {
+        	
+        	logger.logError("parse()", "The file is unreadable.");
+        	return false;
+        }
+        
+        return true;
+	}
+	
 	// --------------------- PARSE --------------------- //
 	
 	public static Vector<TableData> parse(String path) {
 		
 	  try {
 			
-	        File jMeriseSQL = new File(path);   
-	        Scanner scanner = new Scanner(jMeriseSQL);
+	        File sqlFile = new File(path);   
+	        Scanner scanner = new Scanner(sqlFile);
 	        
-	        // [file] check if all is well configured
-	        if(!jMeriseSQL.exists()) {
-	        	
-	        	logger.logError("parse()", "The file not exists.");
-	        	scanner.close();
-	        	return listOfTables;
-	        	
-	        } else if (!jMeriseSQL.canRead()) {
-	        	
-	        	logger.logError("parse()", "The file is unreadable.");
+	        if (!isDocumentValid(sqlFile)) {
 	        	scanner.close();
 	        	return listOfTables;
 	        } 
 	         
-	        i = 1; // we start like the .sql file
+	        i = 1; // we start like an classic document opned in editor
 	        marker = 9999;
 	    	TableData newTable = null;
 	    	
@@ -558,8 +563,8 @@ public class Parser {
 	            		marker = i;
 	            		
 			  	    	// init arrays for the next table
-			  	    	arrayAttributeTemp = new LinkedList<String>();
-			  	    	arrayTypeTemp = new LinkedList<String>();
+			  	    	arrayAttributeTemp = new ArrayList<String>();
+			  	    	arrayTypeTemp = new ArrayList<String>();
 			  	    	
 //			  	    	mapAttributeDataTemp = new HashMap<String, ArrayList<String>>();
 		        	} 
@@ -568,9 +573,9 @@ public class Parser {
 	            		
 		            	if(isConstraintLine(temp)) {
 		            		
-		            		// DEBUG
 	            			if (isComposedPrimaryKey(temp)) {
-	            				out.println("PIVOT ! - current line : " + temp);
+	            				arrayForeignKeysTemp = getComposedPrimaryKeys(temp);
+	            				isIntermediaryTable = true;
 	            			}
 		            		
 			            } else {
@@ -579,7 +584,6 @@ public class Parser {
 		                		
 			            		attribute = getAttributeName(temp);
 			            		type = getTypeOfAttribute(temp);
-			   
 			            		arrayAttributeTemp.add(attribute);
 			            		arrayTypeTemp.add(type);
 			            		
@@ -588,10 +592,15 @@ public class Parser {
 		            			// Prepare new tableData and push to list
 			            		newTable = new TableData();
 			            		
+			            		newTable.setIntermediaryTable(isIntermediaryTable);
 			            		newTable.setTableName(tableName);    	
 			            		newTable.setAttributeList(arrayAttributeTemp);
 			            		newTable.setTypesList(arrayTypeTemp);
 			            		
+			            		if(isIntermediaryTable) {
+			            			newTable.setForeignKeyList(arrayForeignKeysTemp);
+			            		}
+			            		          		
 			            		listOfTables.add(newTable);
 			            		marker = 0; // Reset for the next new table	
 			            	} 
@@ -601,8 +610,7 @@ public class Parser {
 	        	
 	          i++;
 	        }
-	
-			out.println("ARRAY LENGTH : " + listOfTables.size());
+	        
 			scanner.close();
 			return listOfTables;
 			

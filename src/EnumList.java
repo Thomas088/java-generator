@@ -9,59 +9,123 @@ import java.util.Map;
  */
 public class EnumList {
 	
-	// MAKE AN ENUM FOR DISPLAY ALL TYPES
+	// AN ENUM FOR DISPLAY ALL MARIADB DATA TYPES
 	// NOT EXHAUSTIVE
-	public enum mariaAttributeTypesListEnum { 
+	/**
+	 * 
+	 * @author Java Generator Team
+	 *
+	 */
+	public static enum MariaAttributeTypesListEnum { 
 		
+		// Integers
 		INT("INT"),
-		BIGINT("BIGINT"),
-		AUTO_INCREMENT("AUTO_INCREMENT"),
-		TINYINT("TINYINT"),
-		TINYTEXT("TINYTEXT"),
-		BLOB("BLOB"),
-		TEXT("TEXT"),
 		SMALLINT("SMALLINT"),
+		TINYINT("TINYINT"),
+		MEDIUMINT("MEDIUMINT"),
+		BIGINT("BIGINT"),
+		
+		// Floats and Doubles
 		FLOAT("FLOAT"),
 		DOUBLE("DOUBLE"),
+		DECIMAL("DECIMAL"),
+		
+		// Strings
 		VARCHAR("VARCHAR"),
+		TINYTEXT("TINYTEXT"),
+		TEXT("TEXT"),
+		LONGTEXT("LONGTEXT"),
+		
+		// ID's
+		AUTO_INCREMENT("AUTO_INCREMENT"),
+		PRIMARY_KEY("PRIMARY_KEY"),
+		FOREIGN_KEY("FOREIGN_KEY"),
+
+		// Binary types
+		BLOB("BLOB"),
+		
+		// Date / Time
 		DATE("DATE"),
 		TIME("TIME"),
 		DATETIME("DATETIME"),
 		TIMESTAMP("TIMESTAMP"),
+		
+		// booleans
 		BOOL("BOOL"),
 		BOOLEAN("BOOLEAN");
 
 		private String currentType;
-	    private static Map<String, mariaAttributeTypesListEnum> MARIA_TYPES_MAP;
+	    private static Map<String, MariaAttributeTypesListEnum> MARIA_TYPES_MAP;
 
 	    // ENUM CONSTRUCTOR
-	    mariaAttributeTypesListEnum(String currentType) {
-	        this.currentType = currentType.trim() ;
+	    /**
+	     * MariaAttributeTypesListEnum()
+	     * @param currentType
+	     */
+	    MariaAttributeTypesListEnum(String currentType) {
+	        this.currentType = currentType;
 	    }
 
-	    public String getName() {
+	    public String getType() {
 	        return this.currentType;
 	    }
 
 	    static {
 	    	
-	        Map<String, mariaAttributeTypesListEnum> mariaTypesMap = new HashMap<String, mariaAttributeTypesListEnum>();
+	        Map<String, MariaAttributeTypesListEnum> mariaTypesMap = new HashMap<String, MariaAttributeTypesListEnum>();
 	        
-	        for (mariaAttributeTypesListEnum type : mariaAttributeTypesListEnum.values()) {
-	        	mariaTypesMap.put(type.getName().toLowerCase(), type); // on lie le nom du type avec son l'enum associe
+	        for (MariaAttributeTypesListEnum type : MariaAttributeTypesListEnum.values()) {
+	        	mariaTypesMap.put(type.getType().toLowerCase(), type); // on lie le nom du type avec son l'enum associe
 	        }
 	        
 	        MARIA_TYPES_MAP = Collections.unmodifiableMap(mariaTypesMap);
 	    }
 
-	    // [BONUS] : obtenir l'enum via la string
-	    public static mariaAttributeTypesListEnum getAsEnum(String name) {
+	    // [BONUS] : obtenir l'enum via la string (donc l'inverse)
+	    public static MariaAttributeTypesListEnum getAsEnum(String name) {
 	        return MARIA_TYPES_MAP.get(name.toLowerCase());
 	    }
 	}
 	
-	// (optionnal)
-	public enum ColorPaletteEnum {
+	
+	// AN ENUM FOR DISPLAY ALL FAKE_DATABASE.FAKE_DATAS DATA TYPES
+	// NOT EXHAUSTIVE
+	/**
+	 * 
+	 * @author Java Generator Team
+	 *
+	 */
+	public static enum FakeDatasFromFakeDatabaseTypesEnum {
+		
+		FIRSTNAME("FIRSTNAME"),
+		LASTNAME("LASTNAME"),
+		ADDRESS("ADDRESS"),
+		ZIP_CODE("ZIP_CODE"),
+		CITY("CITY"),
+		COUNTRY("COUNTRY"),
+		PHONE("TEXT"),
+		EMAIL("EMAIL"),
+		JOB("JOB");
+	    
+		private String dataType;
+
+	    // CONSTRUCTOR
+	    FakeDatasFromFakeDatabaseTypesEnum(String currentType) {
+	        this.dataType = currentType;
+	    }
+
+	    public String getName() {
+	        return this.dataType;
+	    }
+	}
+	
+	// AN ENUM FOR DISPLAY ALL COLORS (Optionnal - for style JavaFX components ?)
+	/**
+	 * 
+	 * @author Java Generator Team
+	 *
+	 */
+	public static enum ColorPaletteEnum {
 		
 	    //Color end string, color reset
 	    RESET("\033[0m"),
@@ -126,7 +190,7 @@ public class EnumList {
 	    CYAN_BOLD_BRIGHT("\033[1;96m"),     
 	    WHITE_BOLD_BRIGHT("\033[1;97m"),    
 
-	    // High Intensity backgrounds
+	    // High Intensity background
 	    BLACK_BACKGROUND_BRIGHT("\033[0;100m"),     
 	    RED_BACKGROUND_BRIGHT("\033[0;101m"),       
 	    GREEN_BACKGROUND_BRIGHT("\033[0;102m"),     
@@ -149,13 +213,17 @@ public class EnumList {
 
 	    private final String colorCode;
 
+	    // CONSTRUCTOR
+	    /**
+	     * ColorPaletteEnum() : A basic color palette (with ANSI Colors)
+	     * @param code
+	     */
 	    ColorPaletteEnum(String code) {
 	        this.colorCode = code;
 	    }
 
-	    public String getName() {
+	    public String getColorCode() {
 	        return this.colorCode;
 	    }
 	}
-	
 }

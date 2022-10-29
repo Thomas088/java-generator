@@ -1,5 +1,6 @@
 import java.util.regex.Pattern;
 
+
 /**
  * RegexRepertory => Class Repertory for all regex pattern
  * @author Java Generator Team

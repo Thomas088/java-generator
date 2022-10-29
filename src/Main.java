@@ -53,7 +53,6 @@ public class Main {
         	// Parser automatiquement
         	listOfTables = parser.parse("./labo-test/DBQ10.sql");
         	parser.printArrayTableData(listOfTables);
-        	
           
         } catch (Exception e) {
         	logger.logError("Main()", e.getMessage());			

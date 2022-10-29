@@ -37,6 +37,7 @@ public class Parser {
 	private static LinkedList<String> arrayTypeTemp;
 	
 	private static HashMap<String, ArrayList<String>> mapAttributeDataTemp;
+//	private static ArrayList<String> array
 	
 	private static boolean isNumberFounded;
 	private static boolean isEmptySpace;
@@ -450,6 +451,44 @@ public class Parser {
     	}
     	
     	return getTablenameByIndex(currentLine.toString());
+	}
+	
+	
+	/**
+	 * getComposedPrimaryKeys = get if the primary keys from intermediary table (pivot)
+	 * @param {String} currentLine : the line to evaluate : the line to evaluate
+	 * @return {boolean} the response
+	 */
+	private static ArrayList<String> getComposedPrimaryKeys(String currentLine) {
+		
+		if (!isPrimaryKeyLineStart(currentLine)) {
+			return false;
+		}
+
+		currentCharacter.setLength(0);
+		
+		for (int i = 0; i < currentLine.length(); i++) {
+			
+			currentCharacter.append(Character.toString(currentLine.charAt(i)));
+			isEmptySpace = isEmptySpace(currentCharacter.toString());
+			
+			if (!isEmptySpace) {
+				
+				if (currentCharacter.toString().equals(openParenthese)) {
+					marker = i; // start primary key list after the parenthese
+				}
+					
+				if (i > marker && (i != (currentLine.length() - 1))) { // we are in primary key list
+					
+					if (currentCharacter.toString().equals(virgule)) {
+						return true; // We don't search anymore - the next comma is another primary key or after close parentheses
+					}  	
+				}
+			}
+			currentCharacter.setLength(0); // for each character in the line
+		}
+		
+		return false;
 	}
 	
 	public static void printArrayTableData(Vector<TableData> array) {

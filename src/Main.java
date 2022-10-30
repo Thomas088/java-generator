@@ -66,8 +66,8 @@ public class Main {
 //			 }
 
         	// OK - TESTED 
-//        	fileToExport = fileHandler.createFile("eci-insert-test");	
-//        	fileHandler.writeToFile(10, listOfTables, fileToExport.getAbsolutePath());
+        	fileToExport = fileHandler.createFile("eci-insert-test");	
+        	fileHandler.writeToFile(10, listOfTables, fileToExport.getAbsolutePath());
         	
         } catch (Exception e) {
         	logger.logError("Main()", e.getMessage());			

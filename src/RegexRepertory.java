@@ -22,7 +22,7 @@ public class RegexRepertory {
 	// ------------------- GETTERS / SETTERS --------------------- //
 	
 	/**
-	 * getLettersPattern() = get the (only) letters pattern
+	 * getLettersPattern() : get the (only) letters pattern
 	 * @return {Pattern} the regex pattern
 	 */
 	public Pattern getLettersPattern() {
@@ -30,7 +30,7 @@ public class RegexRepertory {
 	}
 	
 	/**
-	 * getNumbersPattern() = get the (only) numbers pattern
+	 * getNumbersPattern() : get the (only) numbers pattern
 	 * @return {Pattern} the regex pattern
 	 */
 	public Pattern getNumbersPattern() {
@@ -38,7 +38,7 @@ public class RegexRepertory {
 	}
 	
 	/**
-	 * getSpecialSharactersPattern() = get the (only) special characters pattern
+	 * getSpecialSharactersPattern() : get the (only) special characters pattern
 	 * @return {Pattern} the regex pattern
 	 */
 	public Pattern getSpecialSharactersPattern() {
@@ -46,7 +46,7 @@ public class RegexRepertory {
 	}
 	
 	/**
-	 * getSpecialCharactersWithoutDotPattern() = get the (only) special characters pattern (without the dot)
+	 * getSpecialCharactersWithoutDotPattern() : get the (only) special characters pattern (without the dot)
 	 * @return {Pattern} the regex pattern
 	 */
 	public Pattern getSpecialCharactersWithoutDotPattern() {
@@ -54,7 +54,7 @@ public class RegexRepertory {
 	}
 
 	/**
-	 * getEmailRegex() = get the email verification pattern (light)
+	 * getEmailRegex() : get the email verification pattern (light)
 	 * @return {Pattern} the regex pattern
 	 */
 	public Pattern getEmailRegex() {
@@ -62,7 +62,7 @@ public class RegexRepertory {
 	}
 	
 	/**
-	 * getEmailStrictRegex() = get the email verification pattern (advanced)
+	 * getEmailStrictRegex() : get the email verification pattern (advanced)
 	 * @return {Pattern} the regex pattern
 	 */
 	public Pattern getEmailStrictRegex() {
@@ -70,7 +70,7 @@ public class RegexRepertory {
 	}
 	
 	/**
-	 * getPhoneRegex() = get the telephone number verification pattern (advanced)
+	 * getPhoneRegex() : get the telephone number verification pattern (advanced)
 	 * @return {Pattern} the regex pattern
 	 */
 	public Pattern getPhoneRegex() {
@@ -78,7 +78,7 @@ public class RegexRepertory {
 	}
 	
 	/**
-	 * getSingleDotForDecimals() = Pattern for check the one dot delimiter (for float and doubles values)
+	 * getSingleDotForDecimals() : Pattern for check the one dot delimiter (for float and doubles values)
 	 * @return {Pattern} the regex pattern
 	 */
 	public Pattern getSingleDotForDecimals() {
@@ -86,7 +86,7 @@ public class RegexRepertory {
 	}
 
 	/**
-	 * getCreateTablePattern() = Pattern for check the CREATE TABLE Statement
+	 * getCreateTablePattern() : Pattern for check the CREATE TABLE Statement
 	 * @return {Pattern} the regex pattern
 	 */
 	public Pattern getCreateTablePattern() {

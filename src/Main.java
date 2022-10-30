@@ -1,15 +1,9 @@
 import static java.lang.System.*;
-
-import java.nio.file.Path;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
+import java.io.File;
 import java.util.Vector;
-import java.lang.StringBuilder;
 
 /**
- * 
+ * Main => The main entry point of the program
  * @author Java Generator Team
  *
  */
@@ -17,86 +11,64 @@ public class Main {
 	
 	/**
 	 * Main() => The main software program
-	 * @param args
+	 * @param {String[]} args (argv in C / C++)
 	 */
 	public static void main(String[] args) {
 		
 		// IMPORT DES AUTRES CLASSES NECESSAIRE AU MENU
-		MenuDisplays menus = new MenuDisplays();
-	    Parser parser = new Parser();
 		DatabaseController database = new DatabaseController();
-		GeneratorLogger logger = new GeneratorLogger();
+		Parser parser = new Parser();
+		FileHandler fileHandler = new FileHandler();
 		Vector<TableData> listOfTables = new Vector<TableData>();
+		GeneratorLogger logger = new GeneratorLogger();
+		File fileToExport;
 		
 		boolean isLogged = false;
-		
-		TableData currentTable = null;
 		
         String userInput = "";
         String currentAttribut = "";
         String answerForTables = "y";
         String answerForAttribut = "y";
         
+        // START PROGRAM
         try {
         	   	
             isLogged = database.createConnection();
             
-            if (isLogged) {
-            	logger.logInfo("createConnection()", "Connexion success.");
-//            	database.callSearchDatasProcedure("address", 50); // <= Decommenter pour tester     	
-            } else {
-            	logger.logError("createConnection()", "Error on connexion to database.");
-            }
+            if (isLogged) 
+            	 logger.logInfo("createConnection()", "Connexion success.");
+	        else logger.logError("createConnection()", "Error on connexion to database.");
  
-        	// Parser automatiquement
+        	// Parsing automatic mode at start 
         	listOfTables = parser.parse("./labo-test/mcfly.sql");
+        	
+        	MenuDisplays.printMainMenu();
+        	
+        	out.println("Here is the list af the tables : ");
         	parser.printArrayTableData(listOfTables);
             
-            parser.createFile("eci-insert-test");
-           
-//  			while(answerForAttribut.toString().equalsIgnoreCase("y")) {
-//  				out.println("Enter table name : ");
-//  				userInput = helper.readString(); // déjà un while dans le Helpers
-//  				
-//  				currentTable = new TableData(); // On instancie un nouvel objet pour chaque infos que le user rentre
-//  				currentTable.setTableName(userInput);
-//  				
-//  				// La variable est deja etablie une fois a oui pour pouvoir encoder les attributs
-//  				while(answerForAttribut.equalsIgnoreCase("y"))	
-//  					
-//  				{
-//  					answerForAttribut = "";
-//  					out.println("Enter attribute name : ");
-//  					
-//  					currentAttribut = helper.readString();
-//  					currentTable.pushInAttributeList(currentAttribut);
-//  					
-//  					answerForAttribut = helper.chooseContinueState();
-//  					
-//  					if(answerForAttribut.equalsIgnoreCase("n")) {
-//  						break;
-//  					} else {
-//  						answerForAttribut;
-//  					}
-//  					
-//  				};
-//  				
-//  				listOfTables.add(currentTable);
-//  				
-//  				if (listOfTables.size() >= 1) {
-//  					out.println("Voulez vous re-entrer une 2eme table");
-//  				}
-//  				
-//  				answerForTables = helper.chooseContinueState(); // méthode de l'état de continue ou non dans les Helpers
-//  				
-//  				if(answerForTables.equalsIgnoreCase("n")) {
-//  					break;
-//  				} else {
-//  					answerForTables = "y";
-//  				}
-//  				
-//  			 }
-        
+        	
+            // Variable is set once for enter in loop..
+        	
+//			while(answerForAttribut.toString().equalsIgnoreCase("y")) {
+//
+//				userInput = Helpers.readString(); // déjà un while dans le Helpers
+//				
+//				// LAST CONTINUE
+//				answerForTables = Helpers.chooseContinueState(); // méthode de l'état de continue ou non dans les Helpers
+//				
+//				if(answerForTables.equalsIgnoreCase("n")) {
+//					break;
+//				} else {
+//					answerForTables = "y";
+//				}
+//				
+//			 }
+
+        	// OK - TESTED 
+//        	fileToExport = fileHandler.createFile("eci-insert-test");	
+//        	fileHandler.writeToFile(10, listOfTables, fileToExport.getAbsolutePath());
+        	
         } catch (Exception e) {
         	logger.logError("Main()", e.getMessage());			
 		}		

@@ -13,9 +13,11 @@ public class TableData {
 	private ArrayList<String> attributeList;
 	private ArrayList<String> databaseEquivalenceList;
 	private ArrayList<String> typesList;
+	private ArrayList<String> varcharList;
+
 	private ArrayList<String> foreignKeyList;
 	private ArrayList<String> isNullList;
-	
+
 	private String tableName = "";
 	
 	// NEW DATA ARCHITECTURE 
@@ -26,41 +28,67 @@ public class TableData {
 	public TableData() {
 		
 		this.tableName = "";
-		
-		// ARRAYS VERSION
 		this.isIntermediaryTable = false;
+		
+		// ARRAYS VERSION - FIRST ARCHITECTURE
 		this.attributeList = new ArrayList<String>();
-		this.databaseEquivalenceList = new ArrayList<String>();
+		this.databaseEquivalenceList = new ArrayList<String>();	
 		this.typesList = new ArrayList<String>();
 		this.foreignKeyList = new ArrayList<String>();
 		this.isNullList = new ArrayList<String>();
+		
+		// Why so many arrays ?? 
+		// Explanations 
+		// We play with the index of each tables
+		
+		// Examples :
+		
+		// 1)
+		// attributeList : [idMenu, name, price, pictureUrl, littleDescription, isDeleted, idCatalogfood]
+		// typesList : [int, varchar, float, varchar, text, bool, int]
+		// nullList : [not-null, not-null, not-null, null (it's just url), null (it's just text), not-null, not-null]
+		
+		// 2)
+		// attributeList : [idOrderfood, reference, date, amount, state, shipStart, shipEnd, isDeleted, idDrone, idAddress]
+	    // typesList : [int, int, date, float, int, text, text, bool, int, int]
+		// nullList : [not-null, not-null, not-null, null (it's just url), null (it's just text), not-null, not-null]
+		
+		// So for retrives the type of... 'reference' for example
+		// attributeList(specified index) will always be the same index as typesList(specified index)
+		
+		// Result example
+		// attributeList(specified index) = reference (order reference number)
+		// AND typesList(specified index) = int
+		// AND nullList(specified index) = not-null
+		
+		// ------------------------------------------------------------------ //
 		
 		// HASHMAP VERSION
 		this.attributeDatas = new HashMap<String, ArrayList<String>>();
 		
 		// attributeDatas ???
 		
-		// Explication de la nouvelle architecture 
-		// Une map qui contiendrait toute les informations par attributs
+		// Explanations of the new architecture 
+		// A map that contains all the attributs informations 
 		
-		// Pour la partie de gauche La cle sera le nom de l'attribut. ex attributeDatas["Prenom"] - attributeDatas["telephone_mobile"]...
-		// Pour le reste, il faut juste bien gerer l'ordre...
+		// The left side is for the attribute (the key), the right side is the attribute datas stored in array
+		// You have to handle and memorize the order
 		
-		// Ordre :
+		// Order :
 		
-		// 1) l'equivalent en DB (firstname, lastname etc) - pour les types primitifs, on utilisera l'enum en place (MariaTypes)
-		// 2) le type (evidemment - int, varchar etc)
-		// 3) la longueur (si varchar... sinon 0)
-		// 4) NULL / NOT NULL (evidemment)
+		// 1) Database equivalence (firstname, lastname etc) - For primitives types, we will use the mariaTypes Enum
+		// 2) The type (obviously - int, varchar etc)
+		// 3) The length (if attribute = varchar, you have to get the length... else 0)
+		// 4) NULL / NOT NULL (obviously - useful if the user want to enter null values)
 		
 		// Exemple :
 		
-		// attributeDatas["id_drone"] = ["auto_increment", "varchar", "0", null]
-		// attributeDatas["Prenom"] = ["firstname", "varchar", "255", not-null]
-		// attributeDatas["nom_de_famille"] = ["lastname", "varchar", "255", not-null]
-		// attributeDatas["age"] = ["number", "number", "0", not-null]
-		// attributeDatas["isDeleted"] = ["boolean", "boolean", "0", not-null]
-		
+		// Key = firstname, Value = ["no-link-to-db-yet", varchar, 50, false]
+		// Key = birthdate, Value = ["DATE", text, 0, false]
+	    // Key = gender, Value = ["TEXT", varchar, 50, false]
+	    // Key = avatarUrl, Value = ["TEXT", varchar, 255, false]
+		// Key = usertype, Value = ["TINYINT", int, 0, false]
+		// Key = isDeleted, Value = ["BOOLEAN", bool, 0, false]
 	}
 	
 	// ------------------- GETTERS / SETTERS --------------------- //
@@ -139,7 +167,7 @@ public class TableData {
 
 	/**
 	 * setIntermediaryTable() : set the table intermediary state of the current table
-	 * @param isIntermediaryTable : the isIntermediaryTable variable to set
+	 * @param {boolean} isIntermediaryTable : the isIntermediaryTable variable to set
 	 */
 	public void setIntermediaryTable(boolean isIntermediaryTable) {
 		this.isIntermediaryTable = isIntermediaryTable;
@@ -147,7 +175,7 @@ public class TableData {
 
 	/**
 	 * getForeignKeyList() : return the list of the foreign keys (if the table is intermediary)
-	 * @return {ArrayList<String>}
+	 * @return {ArrayList<String>} the current foreign key list
 	 */
 	public ArrayList<String> getForeignKeyList() {
 		return foreignKeyList;
@@ -155,7 +183,7 @@ public class TableData {
 
 	/**
 	 * pushInForeignKeyList() : insert new foreign key into the foreignKeyList of the current tableData
-	 * @param foreignKey : the attributeList to set
+	 * @param {String} foreignKey : the attributeList to set
 	 */
 	public void pushInForeignKeyList(String foreignKey) {
 		this.foreignKeyList.add(foreignKey);
@@ -163,7 +191,7 @@ public class TableData {
 
 	/**
 	 * setForeignKeyList() : set the new list of foreign keys into the current foreignKeyList of the current tableData
-	 * @param newForeignKeyList
+	 * @param {ArrayList<String>} newForeignKeyList
 	 */
 	public void setForeignKeyList(ArrayList<String> newForeignKeyList) {
 		this.foreignKeyList = newForeignKeyList;
@@ -171,15 +199,15 @@ public class TableData {
 	
 	/**
 	 * getAttributeDatas() : print all datas for the current TableData
-	 * @return
+	 * @return {Map<String, ArrayList<String>>} the current map
 	 */
 	public Map<String, ArrayList<String>> getAttributeDatas() {
 		return attributeDatas;
 	}
 
 	/**
-	 * setAttributeDatas() : 
-	 * @param attributeAndLength
+	 * setAttributeDatas() : set the new data list into the current TableData
+	 * @param {Map<String, ArrayList<String>>} attributeAndLength
 	 */
 	public void setAttributeDatas(Map<String, ArrayList<String>> attributeAndLength) {
 		this.attributeDatas = attributeAndLength;
@@ -187,8 +215,8 @@ public class TableData {
 	
 	/**
 	 * pushInAttributeDatas() : push for each attributes the datas in the current TableData
-	 * @param attributeKey
-	 * @param attributeDatas
+	 * @param {String} attributeKey
+	 * @param {ArrayList<String>} attributeDatas
 	 */
 	public void pushInAttributeDatas(String attributeKey, ArrayList<String> attributeDatas) {
 		this.attributeDatas.put(attributeKey, attributeDatas);
@@ -196,17 +224,50 @@ public class TableData {
 	
 	/**
 	 * getDatabaseEquivalenceList() : return the equivalence list for all the attribute
-	 * @return
+	 * @return {ArrayList<String>} the equivalence list as array
 	 */
 	public ArrayList<String> getDatabaseEquivalenceList() {
 		return databaseEquivalenceList;
 	}
 
 	/**
-	 * 
+	 * setDatabaseEquivalenceList() : set the database data type array (who match the array this.attributeList)
+	 * [helper for next procedures calls]  
 	 * @param databaseEquivalenceList
 	 */
 	public void setDatabaseEquivalenceList(ArrayList<String> databaseEquivalenceList) {
 		this.databaseEquivalenceList = databaseEquivalenceList;
+	}
+	
+	/**
+	 * getIsNullList() : get the list of null / no-null values (useful if the user explicitely specify null values to add)
+	 * @return {ArrayList<String>} the list of null as array (who match the array this.attributeList)
+	 */
+	public ArrayList<String> getIsNullList() {
+		return isNullList;
+	}
+
+	/**
+	 * isNullList() : set the list of null / no-null values
+	 * @param {ArrayList<String>} the list of null / no-null
+	 */
+	public void setIsNullList(ArrayList<String> isNullList) {
+		this.isNullList = isNullList;
+	}
+	
+	/**
+	 * getVarcharList : get the varchar list of the current tableData attribute list (if the attribute is varchar)
+	 * @return {ArrayList<String>} the varcharList
+	 */
+	public ArrayList<String> getVarcharList() {
+		return varcharList;
+	}
+
+	/**
+	 * setVarcharList() : set the new array of varchar list
+	 * @param {ArrayList<String>} varcharList
+	 */
+	public void setVarcharList(ArrayList<String> varcharList) {
+		this.varcharList = varcharList;
 	}
 }

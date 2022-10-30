@@ -1,5 +1,6 @@
 import static java.lang.System.*;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 import java.util.Vector;
@@ -515,6 +516,11 @@ public class Parser {
 	
 	// --------------------- PARSE --------------------- //
 	
+	/**
+	 * parse() : parse .sql document and extract all datas (tables, attributes, PK/FK keys)
+	 * @param {String} -> the path of the file to read
+	 * @return {Vector<TableData>} the datalist from file
+	 */
 	public Vector<TableData> parse(String path) {
 		
 	  try {
@@ -559,7 +565,7 @@ public class Parser {
 	            	
 	            	if (i > markerForTables) { // we are in attribute list (because attribute start at marker + 1)
 			        	
-		            	if(isConstraintLine(temp)) {
+		            	if (isConstraintLine(temp)) {
 		            		
 	            			if (isComposedPrimaryKey(temp)) {
 	            				
@@ -570,7 +576,7 @@ public class Parser {
 		            		
 			            } else {
 			            	
-		            		if(!isEndOfTable(temp)) { 
+		            		if (!isEndOfTable(temp)) { 
 		                		
 		            			// ARRAY VERSION
 		            			attribute = getAttributeName(temp);
@@ -583,7 +589,8 @@ public class Parser {
 			            		// HASHMAP VERSION
 			            		ArrayList<String> attributeDatasArray = new ArrayList<String>();
 			            		
-			            		// no-link-to-db-yet... refresh : it's the second element of our architecture (arrays starts at 0) - we ask for the type of data in menu 
+			            		// no-link-to-db-yet... refresh : it's the second element of our architecture (arrays starts at 0) - we ask for the type of data in menu
+			            		
 			            		attributeDatasArray.add("no-link-to-db-yet");
 			            		attributeDatasArray.add(type);
 			            		attributeDatasArray.add(String.valueOf(attributeLength));
@@ -601,15 +608,13 @@ public class Parser {
 			            		newTable.setTableName(tableName);    	
 			            		newTable.setAttributeList(arrayAttributeTemp);
 			            		newTable.setTypesList(arrayTypeTemp);
-			            		
+			            	
 			            		if (isIntermediaryTable) {
 			            			newTable.setForeignKeyList(arrayForeignKeysTemp);
 			            		}
 			            		
 			            		// HASHMAP VERSION
-			            		out.println("TABLE " + newTable.getTableName() + " ATTRIBUTES : \n");
-			            		logMap(mapAttributeDatasTemp);
-			            		out.println("\n");
+			            		newTable.setAttributeDatas(mapAttributeDatasTemp);
 			            		
 			            		listOfTables.add(newTable);
 			            		markerForTables = 0; // Reset for the next new table	
@@ -633,40 +638,4 @@ public class Parser {
 	  return null;
 	}
 	
-	public File createFile(String filename) {
-		
-		  sqlFileToCreate = new File("./" + filename + ".sql");
-		
-	      try {
-	    	  
-				if (sqlFileToCreate.createNewFile()) {
-					
-				    System.out.println("File created : " + sqlFileToCreate.getName());
-				    return null;
-				    
-				  } else {  
-				    System.out.println("File : " + sqlFileToCreate.getName() + " already exists.");
-				    return null;
-				  }
-			
-		} catch (IOException e) {
-			logger.logError("writeToFile()", e.getMessage());
-		}
-	      
-		return sqlFileToCreate;
-	}
-	
-	public File writeToFile(int quantityOfLines, Vector<TableData> tables, String path) throws IOException {
-		
-		sqlFileToRead = new File(path);
-		
-		if (!Helpers.isDocumentValidForWrite(sqlFileToRead)) {
-			logger.logError("writeToFile()", "Fail on file.");
-			return sqlFileToRead;
-		}
-		
-		logger.logInfo("writeToFile()", "Fail");
-		return null;
-		
-	}
  }  

@@ -52,14 +52,16 @@ public class EnumList {
 		
 		// booleans
 		BOOL("BOOL"),
-		BOOLEAN("BOOLEAN");
+		BOOLEAN("BOOLEAN"),
+		
+		// MISC
+		NULL("NULL");
 
 		private String currentType;
 	    private static Map<String, MariaAttributeTypesListEnum> MARIA_TYPES_MAP;
 
-	    // ENUM CONSTRUCTOR
 	    /**
-	     * MariaAttributeTypesListEnum()
+	     * MariaAttributeTypesListEnum() - ENUM CONSTRUCTOR
 	     * @param currentType
 	     */
 	    MariaAttributeTypesListEnum(String currentType) {
@@ -213,9 +215,8 @@ public class EnumList {
 
 	    private final String colorCode;
 
-	    // CONSTRUCTOR
 	    /**
-	     * ColorPaletteEnum() : A basic color palette (with ANSI Colors)
+	     * ColorPaletteEnum() : A basic color palette (with ANSI Colors) - ENUM CONSTRUCTOR
 	     * @param code
 	     */
 	    ColorPaletteEnum(String code) {

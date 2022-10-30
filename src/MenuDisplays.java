@@ -17,10 +17,10 @@ public class MenuDisplays {
 	/**
 	 * printMainMenu()
 	 */
-	public void printMainMenu() { 
+	public static void printMainMenu() { 
 		
 		out.println("-----------------------------------------");
-		out.println("---- ECI INSERT / UPDATE GENERATOR ------");
+		out.println("--------- ECI INSERT GENERATOR ----------");
 		out.println("-----------------------------------------");
 
 	}
@@ -28,7 +28,7 @@ public class MenuDisplays {
 	/**
 	 * printMariaTypes()
 	 */
-	 public void printMariaTypes() { 
+	 public static void printMariaTypes() { 
 		 
 		 	i = 1;
 			for (EnumList.MariaAttributeTypesListEnum type : EnumList.MariaAttributeTypesListEnum.values()) {
@@ -41,7 +41,7 @@ public class MenuDisplays {
 	/**
 	 * printFakeDatabaseTypes() => our type of data in database
 	 */
-	 public void printFakeDatabaseTypes() { 
+	 public static void printFakeDatabaseTypes() { 
 		 
 			i = 1;
 			for (EnumList.FakeDatasFromFakeDatabaseTypesEnum type : EnumList.FakeDatasFromFakeDatabaseTypesEnum.values()) {

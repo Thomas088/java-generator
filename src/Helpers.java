@@ -1,14 +1,13 @@
 import static java.lang.System.*;
-
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
- * 
- * @author Utilisateur
+ * Helpers => A class for group all useful methods 
+ * @author Java Generator Team
  *
  */
 public class Helpers {
@@ -17,10 +16,14 @@ public class Helpers {
 	// https://www.theserverside.com/video/Why-we-use-static-final-in-Java-for-constants#:~:text=The%20static%20keyword%20means%20the,to%20create%20a%20constant%20value
 	private static final Scanner scanner = new Scanner(new InputStreamReader(System.in));
 	private static final StringBuilder inputCurrentValue = new StringBuilder();
+	private static final StringBuilder toConcat = new StringBuilder();
 	private static final RegexRepertory regexRepertory = new RegexRepertory();
 	private static final GeneratorLogger logger = new GeneratorLogger();
 	private static Matcher matcher; // not final because different regex evaluated in different helpers 
 	
+	
+	private static int i;
+	private static int allAttributesLength;
 	private static boolean isLetterFounded;
 	private static boolean isNumberFounded;
 	private static boolean isSpecialCharFounded;
@@ -31,17 +34,43 @@ public class Helpers {
 //	private static final String newline = System.getProperty("line.separator"); // a voir si besoin par la suite
 
 	// FOR TEMPLATE
-	public String startTemplateInsert(String nameTable) {
+	public static String startTemplateInsert(String nameTable) {
 	    return "INSERT INTO " + nameTable;
+	}
+	
+	public static String printAllAttributes(TableData table) {
+		
+		toConcat.setLength(0);
+		toConcat.append("(");
+		allAttributesLength = table.getAttributeList().size();
+		
+		i = 0;
+		for (String attr: table.getAttributeList()) { 
+			
+			if (i < (allAttributesLength - 1)) {
+				toConcat.append(attr + ", ");
+			} else {
+				toConcat.append(attr);
+			}
+			
+			i++;
+		}
+		
+	    toConcat.append(") ");
+	    return toConcat.toString();
+	}
+	
+	public static String addValuesInsert() {
+	    return "VALUES " + "(SOON...)" +  ";";
 	}
 	
 	// MYSQL - MARIA
 	
-	public String transformToMySQLDate(int[] date) {
+	public static String transformToMySQLDate(int[] date) {
 		
 		String dateStr = "";
 		
-		for (Integer i = 0; i < date.length; i++) {
+		for (int i = 0; i < date.length; i++) {
 			dateStr += date[i] + ((i != date.length - 1) ? "-" : "");
 		}
 		
@@ -49,7 +78,7 @@ public class Helpers {
 	}
 	
 	
-	public String transformToMySQLDatetime(int[] date, int[] time) {
+	public static String transformToMySQLDatetime(int[] date, int[] time) {
 		
 		String dateTimeStr = "";
 		return ""; // TODO - A CREER
@@ -61,7 +90,7 @@ public class Helpers {
 	 * chooseContinueState() = method for ask to user for continue or not
 	 * @return {String} the response (Yy/Nn)
 	 */
-	public String chooseContinueState() {
+	public static String chooseContinueState() {
 	
 		while(true) {
 			
@@ -93,7 +122,7 @@ public class Helpers {
 	 * readInt() = method for ask to user for enter a int value
 	 * @return {Integer} the result
 	 */
-	public Integer readInt() {
+	public static Integer readInt() {
 		
 		while (true) {
 			
@@ -128,7 +157,7 @@ public class Helpers {
 	 * readFloat() = method for ask to user for enter a float value
 	 * @return {Float} the result
 	 */
-	public Float readFloat() {
+	public static Float readFloat() {
 		
 		Float value = 0.0f;
 		
@@ -173,7 +202,7 @@ public class Helpers {
 	 * readDouble() = method for ask to user for enter a double value
 	 * @return {Double} the result
 	 */
-	public Double readDouble() {
+	public static Double readDouble() {
 		
 		Double value = 0.0;
 	
@@ -218,7 +247,7 @@ public class Helpers {
 	 * readString() = Method for ask to user for enter a string value
 	 * @return {String} the result
 	 */
-	public String readString() {
+	public static String readString() {
 		
 		while(true) {
 			
@@ -242,7 +271,7 @@ public class Helpers {
 	 * readStringWithoutNumbers() = Method for ask to user for enter a string value (without numbers)
 	 * @return {String} the result
 	 */
-	public String readStringWithoutNumbers() {
+	public static String readStringWithoutNumbers() {
 		
 		while(true) {
 			
@@ -266,11 +295,13 @@ public class Helpers {
 		return inputCurrentValue.toString();
 	}
 	
+	// --------- Helpers for Files (read, write etc) ----------- // 
+	
 	/**
 	 * readStringWithoutSpecialCharacters() = Method for ask to user for enter a string value (without special characters)
 	 * @return {String} the result
 	 */
-	public String readStringWithoutSpecialCharacters() {
+	public static String readStringWithoutSpecialCharacters() {
 		
 		while(true) {
 			
@@ -295,6 +326,49 @@ public class Helpers {
 		return inputCurrentValue.toString();
 	}
 	
+	/**
+	 * isDocumentValidForRead() : check if the .sql file is valid and available (or not)
+	 * @param {File} currentFile
+	 * @return {boolean} the response
+	 */
+	public static boolean isDocumentValidForRead(File currentFile) {
+		
+        if(!currentFile.exists()) {   	
+        	logger.logError("isDocumentValidForRead()", "The file " + currentFile.getName() + " not exists.");
+        	return false;
+        	
+        } else if (!currentFile.canRead()) {
+        
+        	logger.logError("isDocumentValidForRead()", "The file " + currentFile.getName() + " is unreadable.");
+        	return false;
+        }
+        
+        logger.logInfo("isDocumentValidForRead()", "File " + currentFile.getName() + " opened with success.");
+        return true;
+	}
+	
+	
+	/**
+	 * isDocumentValidForWrite() : check if the .sql file is valid and available (or not)
+	 * @param {File} currentFile
+	 * @return {boolean} the response
+	 */
+	public static boolean isDocumentValidForWrite(File currentFile) {
+		
+        if(!currentFile.exists()) {   	
+        	logger.logError("isDocumentValidForWrite()", "The file " + currentFile.getName() + " not exists.");
+        	return false;
+        	
+        } else if (!currentFile.canWrite()) {
+        
+        	logger.logError("isDocumentValidForWrite()", "The file " + currentFile.getName() + " is unreadable.");
+        	return false;
+        }
+        
+        logger.logInfo("isDocumentValidForWrite()", "File " + currentFile.getName() + " opened with success.");
+        return true;
+	}
+	
 
 	// MISC
 	/**
@@ -303,24 +377,19 @@ public class Helpers {
 	 */
 	public static void clearConsole() throws Exception {
 		
-		out.println("SCREEN CLEARED");
-		
 	    try {
 
 	     if (System.getProperty("os.name").contains("Windows")) {
 	         new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
 	     	 out.println('\n');
+	     	 out.println("SCREEN CLEARED");
 	     } else {
 	    	 Runtime.getRuntime().exec("clear");
+	    	 out.println("SCREEN CLEARED");
 	     }    
 	    } catch (IOException | InterruptedException ex) {
 	    	throw ex;
 	    }
 	}
-	
-	public int generateRandom(int max, int min) {
-		int random = (int)Math.floor( Math.random() * (max - min + 1) + min);
-		return random;
-	}
-	
+
 }

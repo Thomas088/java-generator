@@ -12,14 +12,15 @@ public class MenuDisplays {
 
 	private static final Helpers helper = new Helpers();
 	private static final Scanner scanner = new Scanner(new InputStreamReader(System.in));
+	private static int i;
 	
 	/**
 	 * printMainMenu()
 	 */
-	public void printMainMenu() { 
+	public static void printMainMenu() { 
 		
 		out.println("-----------------------------------------");
-		out.println("---- ECI INSERT / UPDATE GENERATOR ------");
+		out.println("--------- ECI INSERT GENERATOR ----------");
 		out.println("-----------------------------------------");
 
 	}
@@ -27,11 +28,24 @@ public class MenuDisplays {
 	/**
 	 * printMariaTypes()
 	 */
-	 public void printMariaTypes() { 
+	 public static void printMariaTypes() { 
 		 
-			int i = 1;
-			for (EnumList.mariaAttributeTypesListEnum attribute : EnumList.mariaAttributeTypesListEnum.values()) {
-				out.println(i + " - " + attribute);
+		 	i = 1;
+			for (EnumList.MariaAttributeTypesListEnum type : EnumList.MariaAttributeTypesListEnum.values()) {
+				out.println(i + " - " + type);
+				i++;
+			}
+	}
+	 
+	 
+	/**
+	 * printFakeDatabaseTypes() => our type of data in database
+	 */
+	 public static void printFakeDatabaseTypes() { 
+		 
+			i = 1;
+			for (EnumList.FakeDatasFromFakeDatabaseTypesEnum type : EnumList.FakeDatasFromFakeDatabaseTypesEnum.values()) {
+				out.println(i + " - " + type);
 				i++;
 			}
 	}

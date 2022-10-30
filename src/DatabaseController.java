@@ -139,26 +139,23 @@ import static java.lang.System.*;
 		 * @return {boolean} : if the connection success or fail
 		 */
 		public boolean createConnection() {
-			
-			boolean isSuccess = false;
 
 			try {
 	
-				    	connection = DriverManager.getConnection(url.toString() 
+				    connection = DriverManager.getConnection(url.toString() 
 				    										+ databaseName.toString() 
 				    										+ "?user="+ user.toString() 
 				    										+ "&password="+ pwd.toString());
-				    	
-	
 				    
-				    if (connection.isValid(5)) isSuccess = true;
+				    if (connection.isValid(5)) return true;
 			
 				} catch (SQLException e) {
-					isSuccess = false;
 					logger.logError("createConnection()", e.getMessage());
+					return false;
+					
 				}
 			
-		    return isSuccess;
+			return false;
 		}	
     }
 

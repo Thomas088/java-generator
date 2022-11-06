@@ -1,19 +1,18 @@
 // db config
-import java.sql.Connection;
-import java.sql.Driver;
-import java.sql.DriverManager;
 
-// statements
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
+import java.util.ArrayList;
 // datas
 import java.util.Vector;
 
 //import io.github.cdimascio.dotenv.Dotenv;
 
 import static java.lang.System.*;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * DatabaseController => The class who interact with the database
@@ -30,31 +29,19 @@ import static java.lang.System.*;
 		
 		// Utils
 		private static final GeneratorLogger logger = new GeneratorLogger();
-		private static final Vector<String> dataVector = new Vector<String>();
 		
 		// DB
 		private static Connection connection;
 		private static PreparedStatement statement;
 		
-		DatabaseController() {
+		public DatabaseController() {
 			
 			initCredentials();
-			
-//		------------------------------------------------------- // 
-//			TODO : handle Dotenv !
-			
-//			Dotenv dotenv = Dotenv.load();			
-//			databaseName.append(dotenv.get("MARIADB_DB_NAME"));
-//			url.append(dotenv.get("MARIADB_DB_URL"));
-//	    	user.append(dotenv.get("MARIADB_USER"));
-//	    	pwd.append(dotenv.get("MARIADB_PASSWORD"));
-			
-//			------------------------------------------------------- // 
 			
 			databaseName.append("fake_database");
 			url.append("jdbc:mariadb://localhost:3306/");
 	    	user.append("root");
-	    	pwd.append("");
+	    	pwd.append("password01");
 			
 		}
 		
@@ -73,8 +60,11 @@ import static java.lang.System.*;
 		 * callSearchDatasProcedure() - Call the main procedure in database
 		 * @param {String} tableToSearch => the table to seach in database
 		 * @param {int} limit
+		 * @return {Vector<String>} the data result
 		 */
-		public void callSearchDatasProcedure(String tableToSearch, int limit) {
+		public Vector<String> callSearchDatasProcedure(String tableToSearch, int limit) {
+			
+		    Vector<String> strArr = new Vector<String>();
 				
 			try {	
 				
@@ -88,11 +78,11 @@ import static java.lang.System.*;
 						ResultSet datas = statement.executeQuery();
 			
 						while (datas.next()) {
-							dataVector.add(datas.getString(1).trim());
+							strArr.add(datas.getString(1).trim());
 						}
 						
 						out.println("SUCCESS : \n");
-						out.println(dataVector);
+						return strArr;
 						
 					} else {
 						out.println("STATEMENT NOT OPEN");
@@ -100,22 +90,29 @@ import static java.lang.System.*;
 				
 			} catch (SQLException e) {
 				logger.logError("callSearchDatasProcedure()", e.getMessage()); 			
-			}		
+			}
+			
+			return strArr;
 		}
+		
 		
 		/**
 		 * callGenerateRandomNumber() - Call the random number procedure
 		 * @param {int} min
 		 * @param {int} max
+		 * @return {ArrayList<Integer>} the data result
 		 */
-		public void callGenerateRandomNumber(int min, int max) {
+		public ArrayList<Integer> callGenerateRandomNumber(int min, int max, int limitResult) {
+						
+			ArrayList<Integer> intArr = new ArrayList<Integer>();
 							
 			try {	
 				
-					statement = connection.prepareStatement("{call generate_random_number(?,?);}");
+					statement = connection.prepareStatement("{call generate_random_number(?,?,?);}");
 					
 					statement.setInt(1, min);
 					statement.setInt(2, max);
+					statement.setInt(3, limitResult);
 					
 					if(!statement.isClosed()) {
 						
@@ -123,7 +120,12 @@ import static java.lang.System.*;
 						
 						out.println("SUCCESS : \n");
 						
-						while (datas.next()) out.println(datas.getInt(1));
+						while (datas.next()) {				
+							intArr.add(datas.getInt(1));	
+						}
+						
+						out.println("SUCCESS : \n");
+						return intArr;
 						
 					} else {
 						out.println("STATEMENT NOT OPEN");
@@ -131,8 +133,263 @@ import static java.lang.System.*;
 				
 			} catch (SQLException e) {
 				logger.logError("callGenerateRandomNumber()", e.getMessage()); 			
-			}		
+			}
+			
+			return intArr;
 		}
+		
+		/**
+		 * callGenerateRandomDate() - Call the random number date
+		 * @param {String} dateStart
+		 * @param {String} dateEnd
+		 * @return {Vector<String>} the data response 
+		 */
+		public Vector<String> callGenerateRandomDate(String dateStart, String dateEnd, int limitResult) {			
+			
+			Vector<String> strArr = new Vector<String>();
+							
+			try {	
+				
+					statement = connection.prepareStatement("{call generate_random_date(?,?,?);}");
+					
+					statement.setString(1, dateStart);
+					statement.setString(2, dateEnd);
+					statement.setInt(3, limitResult);
+					
+					if(!statement.isClosed()) {
+						
+						ResultSet datas = statement.executeQuery();
+						
+						while (datas.next()) {
+							strArr.add(datas.getString(1).trim());
+						} 
+						
+						out.println("SUCCESS : \n");
+						return strArr;
+						
+					} else {
+						out.println("STATEMENT NOT OPEN");
+					}
+					
+			} catch (SQLException e) {
+				logger.logError("callGenerateRandomDate()", e.getMessage()); 			
+			}
+			
+			return strArr;
+		}
+		
+		/**
+		 * callGenerateRandomDatetime() - Call the random number date
+		 * @param {String} dateStart
+		 * @param {String} dateEnd
+		 * @return {Vector<String>} the data response 
+		 */
+		public Vector<String> callGenerateRandomDatetime(String dateStart, String dateEnd, int limitResult) {			
+			
+			Vector<String> strArr = new Vector<String>();
+							
+			try {	
+				
+					statement = connection.prepareStatement("{call generate_random_datetime(?,?,?);}");
+					
+					statement.setString(1, dateStart);
+					statement.setString(2, dateEnd);
+					statement.setInt(3, limitResult);
+					
+					if(!statement.isClosed()) {
+						
+						ResultSet datas = statement.executeQuery();
+						
+						while (datas.next()) {
+							strArr.add(datas.getString(1).trim());
+						} 
+						
+						out.println("SUCCESS : \n");
+						return strArr;
+						
+					} else {
+						out.println("STATEMENT NOT OPEN");
+					}
+					
+			} catch (SQLException e) {
+				logger.logError("callGenerateRandomDatetime()", e.getMessage()); 			
+			}
+			
+			return strArr;
+		}
+		
+		
+		/**
+		 * callGenerateRandomTimestamp() - Call the random number date
+		 * @param {String} dateStart
+		 * @param {String} dateEnd
+		 * @return {Vector<String>} the data response
+		 */
+		public Vector<String> callGenerateRandomTimestamp(String TPStart, String TPEnd, int limitResult) {
+			
+            boolean isLogged = createConnection();
+            
+            if (isLogged) 
+            	 logger.logInfo("createConnection()", "Connexion success.");
+	        else logger.logError("createConnection()", "Error on connexion to database.");
+					
+			Vector<String> strArr = new Vector<String>();
+							
+			try {	
+				
+					statement = connection.prepareStatement("{call generate_random_timestamp(?,?,?);}");
+					
+					statement.setString(1, TPStart);
+					statement.setString(2, TPEnd);
+					statement.setInt(3, limitResult);
+					
+					if(!statement.isClosed()) {
+						
+						ResultSet datas = statement.executeQuery();
+					
+						while (datas.next()) {
+							strArr.add(datas.getString(1).trim());
+						} 
+						
+						out.println("SUCCESS : \n");
+						return strArr;
+						
+					} else {
+						out.println("STATEMENT NOT OPEN");
+					}		
+				
+			} catch (SQLException e) {
+				logger.logError("callGenerateRandomTimestamp()", e.getMessage()); 			
+			}
+			
+			return strArr;
+		}
+		
+		/**
+		 * callGenerateRandomTimestamp() - Call the random number date
+		 * @return {String} the data response
+		 */
+		public String callGenerateCurrentTimestamp() {
+			
+            boolean isLogged = createConnection();
+            
+            if (isLogged) 
+            	 logger.logInfo("createConnection()", "Connexion success.");
+	        else logger.logError("createConnection()", "Error on connexion to database.");
+					
+			Vector<String> strArr = new Vector<String>();
+							
+			try {	
+				
+					statement = connection.prepareStatement("{call generate_current_timestamp();}");
+					
+					if(!statement.isClosed()) {
+						
+						ResultSet datas = statement.executeQuery();
+					
+						while (datas.next()) {
+							strArr.add(datas.getString(1).trim());
+						} 
+						
+						out.println("SUCCESS : \n");
+						return strArr.get(0);
+						
+					} else {
+						out.println("STATEMENT NOT OPEN");
+					}		
+				
+			} catch (SQLException e) {
+				logger.logError("callGenerateRandomTimestamp()", e.getMessage()); 			
+			}
+			
+			return strArr.get(0);
+		}
+		
+		/**
+		 * callGenerateLipsum() - Call the random number date
+		 * @param {int} min
+		 * @param {int} max
+		 * @return {Vector<String>} the data response
+		 */
+		public String callGenerateLipsum(int min, int max, int startsWithLoremIpsum) {
+			
+            boolean isLogged = createConnection();
+            
+            if (isLogged) 
+            	 logger.logInfo("createConnection()", "Connexion success.");
+	        else logger.logError("createConnection()", "Error on connexion to database.");
+					
+			Vector<String> strArr = new Vector<String>();
+							
+			try {	
+				
+					statement = connection.prepareStatement("{call loremIpsum(?, ?, ?);}");
+					statement.setInt(1, min);
+					statement.setInt(2, max);
+					statement.setInt(3, startsWithLoremIpsum);
+					
+					if(!statement.isClosed()) {
+						
+						ResultSet datas = statement.executeQuery();
+					
+						while (datas.next()) {
+							strArr.add(datas.getString(1).trim());
+						} 
+						
+						out.println("SUCCESS : \n");
+						return strArr.get(0);
+						
+					} else {
+						out.println("STATEMENT NOT OPEN");
+					}		
+				
+			} catch (SQLException e) {
+				logger.logError("callGenerateRandomTimestamp()", e.getMessage()); 			
+			}
+			
+			return strArr.get(0);
+		}
+		
+		
+		
+		/**
+		 * callGenerateRandomBoolean() - Call the random number boolean
+		 * @param {String} dateStart
+		 * @param {String} dateEnd
+		 * @return {Vector<String>} the data response 
+		 */
+		public Vector<String> callGenerateRandomBoolean(int limitResult) {			
+			
+			Vector<String> strArr = new Vector<String>();
+							
+			try {	
+				
+					statement = connection.prepareStatement("{call generate_random_boolean(?);}");
+					
+					statement.setInt(1, limitResult);
+					
+					if(!statement.isClosed()) {
+						
+						ResultSet datas = statement.executeQuery();
+						
+						while (datas.next()) {
+							strArr.add(datas.getString(1).trim());
+						} 
+						
+						out.println("SUCCESS : \n");
+						return strArr;
+						
+					} else {
+						out.println("STATEMENT NOT OPEN");
+					}
+					
+			} catch (SQLException e) {
+				logger.logError("callGenerateRandomBoolean()", e.getMessage()); 			
+			}
+			
+			return strArr;
+		}
+		
 		
 		/**
 		 * createConnection() : create a session connexion to mariaDB 
@@ -156,6 +413,53 @@ import static java.lang.System.*;
 				}
 			
 			return false;
-		}	
+		}
+		
+		/**
+		 * callGenerateRandomTime() - Call the random number date
+		 * @param {String} dateStart
+		 * @param {String} dateEnd
+		 * @return {Vector<String>} the data response
+		 */
+		public Vector<String> callGenerateRandomTime(String TPStart, String TPEnd, int limitResult) {
+			
+            boolean isLogged = createConnection();
+            
+            if (isLogged) 
+            	 logger.logInfo("createConnection()", "Connexion success.");
+	        else logger.logError("createConnection()", "Error on connexion to database.");
+					
+			Vector<String> strArr = new Vector<String>();
+							
+			try {	
+				
+					statement = connection.prepareStatement("{call generate_random_time(?,?,?);}");
+					
+					statement.setString(1, TPStart);
+					statement.setString(2, TPEnd);
+					statement.setInt(3, limitResult);
+					
+					if(!statement.isClosed()) {
+						
+						ResultSet datas = statement.executeQuery();
+					
+						while (datas.next()) {
+							strArr.add(datas.getString(1).trim());
+						} 
+						
+						out.println("SUCCESS : \n");
+						return strArr;
+						
+					} else {
+						out.println("STATEMENT NOT OPEN");
+					}		
+				
+			} catch (SQLException e) {
+				logger.logError("callGenerateRandomTimestamp()", e.getMessage()); 			
+			}
+			
+			return strArr;
+		}
+		
     }
 

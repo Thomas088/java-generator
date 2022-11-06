@@ -45,13 +45,13 @@ public class TableData {
 		
 		// 1)
 		// attributeList : [idMenu, name, price, pictureUrl, littleDescription, isDeleted, idCatalogfood]
-		// typesList : [int, varchar, float, varchar, text, bool, int]
-		// nullList : [not-null, not-null, not-null, null (it's just url), null (it's just text), not-null, not-null]
+		// typesList :     [int, varchar, float, varchar, text, bool, int]
+		// nullList :      [not-null, not-null, not-null, null (it's just url), null (it's just text), not-null, not-null]
 		
 		// 2)
 		// attributeList : [idOrderfood, reference, date, amount, state, shipStart, shipEnd, isDeleted, idDrone, idAddress]
-	    // typesList : [int, int, date, float, int, text, text, bool, int, int]
-		// nullList : [not-null, not-null, not-null, null (it's just url), null (it's just text), not-null, not-null]
+	    // typesList :     [int, int, date, float, int, text, text, bool, int, int]
+		// nullList :      [not-null, not-null, not-null, null (it's just url), null (it's just text), not-null, not-null]
 		
 		// So for retrives the type of... 'reference' for example
 		// attributeList(specified index) will always be the same index as typesList(specified index)
@@ -63,7 +63,7 @@ public class TableData {
 		
 		// ------------------------------------------------------------------ //
 		
-		// HASHMAP VERSION
+		// HASHMAP VERSION (DICTIONNARY)
 		this.attributeDatas = new HashMap<String, ArrayList<String>>();
 		
 		// attributeDatas ???
@@ -237,6 +237,24 @@ public class TableData {
 	 */
 	public void setDatabaseEquivalenceList(ArrayList<String> databaseEquivalenceList) {
 		this.databaseEquivalenceList = databaseEquivalenceList;
+	}
+	
+	/**
+	 * resetDatabaseEquivalenceList() : reset the database data type array
+	 * [helper for next procedures calls]  
+	 * @param databaseEquivalenceList
+	 */
+	public void resetDatabaseEquivalenceList() {
+		this.databaseEquivalenceList.clear();
+	}
+	
+	/**
+	 * setDatabaseEquivalenceList() : set the database data type array (who match the array this.attributeList)
+	 * [helper for next procedures calls]  
+	 * @param databaseEquivalenceList
+	 */
+	public void pushInDatabaseEquivalenceList(String databaseEquivalenceType) {
+		this.databaseEquivalenceList.add(databaseEquivalenceType);
 	}
 	
 	/**

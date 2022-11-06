@@ -32,13 +32,7 @@ public class Main {
         
         // START PROGRAM
         try {
-        	   	
-            isLogged = database.createConnection();
-            
-            if (isLogged) 
-            	 logger.logInfo("createConnection()", "Connexion success.");
-	        else logger.logError("createConnection()", "Error on connexion to database.");
- 
+        	   
         	// Parsing automatic mode at start 
         	listOfTables = parser.parse("./labo-test/mcfly.sql");
         	
@@ -46,28 +40,28 @@ public class Main {
         	
         	out.println("Here is the list af the tables : ");
         	parser.printArrayTableData(listOfTables);
-            
         	
             // Variable is set once for enter in loop..
         	
-//			while(answerForAttribut.toString().equalsIgnoreCase("y")) {
-//
-//				userInput = Helpers.readString(); // déjà un while dans le Helpers
-//				
-//				// LAST CONTINUE
-//				answerForTables = Helpers.chooseContinueState(); // méthode de l'état de continue ou non dans les Helpers
-//				
-//				if(answerForTables.equalsIgnoreCase("n")) {
-//					break;
-//				} else {
-//					answerForTables = "y";
-//				}
-//				
-//			 }
+			while(answerForAttribut.toString().equalsIgnoreCase("y")) {
 
-        	// OK - TESTED 
+				userInput = Helpers.readString(); // déjà un while dans le Helpers
+				
+				// LAST CONTINUE
+				answerForTables = Helpers.chooseContinueState(); // méthode de l'état de continue ou non dans les Helpers
+				
+				if(answerForTables.equalsIgnoreCase("n")) {
+					break;
+				} else {
+					answerForTables = "y";
+				}
+				
+			 }
+            
         	fileToExport = fileHandler.createFile("eci-insert-test");	
         	fileHandler.writeToFile(10, listOfTables, fileToExport.getAbsolutePath());
+        	
+        	out.println("FILE PATH : " + fileToExport.getAbsolutePath());
         	
         } catch (Exception e) {
         	logger.logError("Main()", e.getMessage());			

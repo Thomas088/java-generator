@@ -28,25 +28,13 @@ public class MenuDisplays {
 	/**
 	 * printMariaTypes()
 	 */
-	 public static void printMariaTypes() { 
-		 
-		 	i = 1;
-			for (EnumList.MariaAttributeTypesListEnum type : EnumList.MariaAttributeTypesListEnum.values()) {
-				out.println(i + " - " + type);
-				i++;
-			}
-	}
-	 
-	 
-	/**
-	 * printFakeDatabaseTypes() => our type of data in database
-	 */
-	 public static void printFakeDatabaseTypes() { 
-		 
-			i = 1;
-			for (EnumList.FakeDatasFromFakeDatabaseTypesEnum type : EnumList.FakeDatasFromFakeDatabaseTypesEnum.values()) {
-				out.println(i + " - " + type);
-				i++;
-			}
-	}
+//	 public static void printMariaTypes() { 
+//		 
+//		 	i = 1;
+//			for (EnumList.MariaAttributeTypesListEnum type : EnumList.MariaAttributeTypesListEnum.values()) {
+//				out.println(i + " - " + type);
+//				i++;
+//			}
+//	}
+	
 }	
